@@ -111,7 +111,7 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
       <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
         <Row k={t(lang, 'visits')} v={`${g.lastVisits}`} />
         <Row k={t(lang, 'signups')} v={`${g.lastSignups}`} sub={`(${(m.convLp * 100).toFixed(1)}%)`} />
-        <Row k={t(lang, 'paying')} v={`${g.paid}`} sub={`+${g.lastNewPaid}/−${g.lastChurned}`} />
+        <Row k={t(lang, 'paying')} v={`${g.paid}`} sub={`(${(m.convPay * 100).toFixed(1)}%)`} />
         <Row k={t(lang, 'churn')} v={g.paid > 0 ? `${(m.churnMonthly * 100).toFixed(0)}%` : '—'} sub={g.paid > 0 ? t(lang, 'perMonth') : ''} />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">

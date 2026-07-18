@@ -9,7 +9,7 @@ import { ACTIONS } from '@/lib/engine/content/actions'
 import { HIRES, hireById } from '@/lib/engine/content/hires'
 import { nicheById } from '@/lib/engine/content/niches'
 import { EVENTS } from '@/lib/engine/content/events'
-import { INSIGHTS, insightById } from '@/lib/engine/content/insights'
+import { insightById } from '@/lib/engine/content/insights'
 import { charById, FOUNDERS } from '@/lib/engine/content/characters'
 import { Bar, Panel, PixelSprite, Sparkline } from './ui'
 
@@ -175,7 +175,7 @@ function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
 function InsightsPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const unlocked = (g.insights ?? []).map((id) => insightById(id)).filter(Boolean)
   return (
-    <Panel title={`💡 ${t(lang, 'insightsTitle')} (${unlocked.length}/${INSIGHTS.length})`}>
+    <Panel title={`💡 ${t(lang, 'insightsTitle')}${unlocked.length ? ` (${unlocked.length})` : ''}`}>
       {unlocked.length === 0 ? (
         <div className="text-xs text-[var(--muted)]">{t(lang, 'insightsHint')}</div>
       ) : (

@@ -116,48 +116,50 @@ export function energyCost(s: GameState, actionId: string): number {
   return Math.max(1, Math.round(a.energy * kindMult * b.allMult))
 }
 
-export function canDoAction(s: GameState, actionId: string, p?: string | number): { ok: boolean; reason?: L } {
+export function canDoAction(s: GameState, actionId: string, p?: string | number): { ok: boolean; reason?: L; hide?: boolean } {
   const a = actionById(actionId)
   if (s.status !== 'playing') return { ok: false }
   if (s.pendingEvent) return { ok: false }
-  const cost = actionId === 'rest' ? 0 : energyCost(s, actionId)
-  if (s.energy < cost) return { ok: false, reason: { ru: 'Не хватает энергии', en: 'Not enough energy', es: 'No hay energía suficiente', zh: '精力不足', pt: 'Energia insuficiente' } }
-  if (a.money && s.money < a.money) return { ok: false, reason: { ru: 'Не хватает денег', en: 'Not enough money', es: 'No hay dinero suficiente', zh: '钱不够', pt: 'Dinheiro insuficiente' } }
-  if (a.once && s.actionCounts[actionId]) return { ok: false, reason: { ru: 'Уже сделано', en: 'Already done', es: 'Ya está hecho', zh: '已经做过了', pt: 'Já feito' } }
-  if (a.perDay && s.todayActions.filter((t) => t.id === actionId).length >= a.perDay)
-    return { ok: false, reason: { ru: 'Хватит на сегодня', en: 'Enough for today', es: 'Suficiente por hoy', zh: '今天够了', pt: 'Chega por hoje' } }
+  // структурные блокировки (hide: true) — действие прячется из списка;
+  // ресурсные (энергия/деньги/лимит дня) — кнопка остаётся, но серая
+  if (a.once && s.actionCounts[actionId]) return { ok: false, hide: true, reason: { ru: 'Уже сделано', en: 'Already done', es: 'Ya está hecho', zh: '已经做过了', pt: 'Já feito' } }
   switch (actionId) {
     case 'add_feature':
     case 'deploy':
     // продвижение заблокировано, пока нет продукта — нечего продвигать
     case 'post':
     case 'ads':
-      if (s.progress < 100) return { ok: false, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first', es: 'Primero termina el MVP', zh: '先把 MVP 做完', pt: 'Termine o MVP primeiro' } }
+      if (s.progress < 100) return { ok: false, hide: true, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first', es: 'Primero termina el MVP', zh: '先把 MVP 做完', pt: 'Termine o MVP primeiro' } }
       break
     case 'landing':
-      if (s.landing >= 1) return { ok: false, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect', es: 'La landing ya es perfecta', zh: '落地页已经完美了', pt: 'A landing já está perfeita' } }
+      if (s.landing >= 1) return { ok: false, hide: true, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect', es: 'La landing ya es perfecta', zh: '落地页已经完美了', pt: 'A landing já está perfeita' } }
       break
     case 'launch':
-      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
+      if (!s.deployed) return { ok: false, hide: true, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
       break
     case 'payments':
-      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
+      if (!s.deployed) return { ok: false, hide: true, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
       break
     case 'fix_bugs':
-      if (s.bugs <= 0) return { ok: false, reason: { ru: 'Багов нет (пока)', en: 'No bugs (yet)', es: 'No hay bugs (todavía)', zh: '没有 bug（暂时）', pt: 'Sem bugs (por enquanto)' } }
+      if (s.bugs <= 0) return { ok: false, hide: true, reason: { ru: 'Багов нет (пока)', en: 'No bugs (yet)', es: 'No hay bugs (todavía)', zh: '没有 bug（暂时）', pt: 'Sem bugs (por enquanto)' } }
       break
     case 'talk_users':
-      if (s.stats.totalSignups <= 0) return { ok: false, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users', es: 'No hay con quién hablar: no hay usuarios', zh: '没人可聊：还没有用户', pt: 'Ninguém para conversar: sem usuários' } }
+      if (s.stats.totalSignups <= 0) return { ok: false, hide: true, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users', es: 'No hay con quién hablar: no hay usuarios', zh: '没人可聊：还没有用户', pt: 'Ninguém para conversar: sem usuários' } }
       break
     case 'hire': {
-      if (stageOf(s) !== 'traction') return { ok: false, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)', es: 'Se desbloquea en la etapa Tracción ($1k MRR)', zh: '增长阶段解锁（$1k MRR）', pt: 'Desbloqueado na fase Tração ($1k MRR)' } }
+      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)', es: 'Se desbloquea en la etapa Tracción ($1k MRR)', zh: '增长阶段解锁（$1k MRR）', pt: 'Desbloqueado na fase Tração ($1k MRR)' } }
       const h = p ? hireById(String(p)) : null
-      if (h && s.hires.includes(h.id)) return { ok: false, reason: { ru: 'Уже в команде', en: 'Already on the team', es: 'Ya está en el equipo', zh: '已经在团队里了', pt: 'Já está no time' } }
+      if (h && s.hires.includes(h.id)) return { ok: false, hide: true, reason: { ru: 'Уже в команде', en: 'Already on the team', es: 'Ya está en el equipo', zh: '已经在团队里了', pt: 'Já está no time' } }
       if (h && s.money < h.monthly) return { ok: false, reason: { ru: 'Не хватает денег на первый месяц', en: 'Cannot afford the first month', es: 'No alcanza para el primer mes', zh: '付不起第一个月', pt: 'Não dá para pagar o primeiro mês' } }
-      if (!p && HIRES.every((x) => s.hires.includes(x.id))) return { ok: false, reason: { ru: 'Все уже наняты', en: 'Everyone is hired', es: 'Ya contrataste a todos', zh: '所有人都雇了', pt: 'Todos já foram contratados' } }
+      if (!p && HIRES.every((x) => s.hires.includes(x.id))) return { ok: false, hide: true, reason: { ru: 'Все уже наняты', en: 'Everyone is hired', es: 'Ya contrataste a todos', zh: '所有人都雇了', pt: 'Todos já foram contratados' } }
       break
     }
   }
+  const cost = actionId === 'rest' ? 0 : energyCost(s, actionId)
+  if (s.energy < cost) return { ok: false, reason: { ru: 'Не хватает энергии', en: 'Not enough energy', es: 'No hay energía suficiente', zh: '精力不足', pt: 'Energia insuficiente' } }
+  if (a.money && s.money < a.money) return { ok: false, reason: { ru: 'Не хватает денег', en: 'Not enough money', es: 'No hay dinero suficiente', zh: '钱不够', pt: 'Dinheiro insuficiente' } }
+  if (a.perDay && s.todayActions.filter((t) => t.id === actionId).length >= a.perDay)
+    return { ok: false, reason: { ru: 'Хватит на сегодня', en: 'Enough for today', es: 'Suficiente por hoy', zh: '今天够了', pt: 'Chega por hoje' } }
   return { ok: true }
 }
 

@@ -261,6 +261,8 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
       <div className="flex flex-col gap-1.5 max-h-[52vh] overflow-y-auto pr-1">
         {visible.map((a) => {
           const check = canDoAction(g, a.id)
+          // структурно недоступные скрываем — список короче, скролла меньше
+          if (!check.ok && check.hide) return null
           const cost = a.id === 'rest' ? g.energy : energyCost(g, a.id)
           const needsExpand = a.id === 'post' || a.id === 'set_price' || a.id === 'hire'
           // MVP готов — «Пилить MVP» превращается в полировку качества

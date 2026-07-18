@@ -21,7 +21,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" className={pixel.variable}>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        {children}
+        <script defer data-domain="guildof.one" src="https://plausible.chatindex.app/js/script.js" />
+      </body>
     </html>
   )
 }

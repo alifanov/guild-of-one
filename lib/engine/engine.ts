@@ -92,7 +92,7 @@ export function newRun(seed: number, buildId: string, nicheId: string): GameStat
     history: [],
     stats: { totalSpend: 0, totalVisits: 0, totalSignups: 0, peakMrr: 0, peakAudience: b.audience },
   }
-  log(s, { ru: 'День 1. Сбережения на столе, идея в голове, кофе в кружке.', en: 'Day 1. Savings on the table, an idea in your head, coffee in the mug.' })
+  log(s, { ru: 'День 1. Сбережения на столе, идея в голове, кофе в кружке.', en: 'Day 1. Savings on the table, an idea in your head, coffee in the mug.', es: 'Día 1. Los ahorros en la mesa, una idea en la cabeza, café en la taza.', zh: '第 1 天。积蓄摆在桌上，点子装在脑里，咖啡倒在杯里。', pt: 'Dia 1. As economias na mesa, uma ideia na cabeça, café na caneca.' })
   return s
 }
 
@@ -108,40 +108,40 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
   if (s.status !== 'playing') return { ok: false }
   if (s.pendingEvent) return { ok: false }
   const cost = actionId === 'rest' ? 0 : energyCost(s, actionId)
-  if (s.energy < cost) return { ok: false, reason: { ru: 'Не хватает энергии', en: 'Not enough energy' } }
-  if (a.money && s.money < a.money) return { ok: false, reason: { ru: 'Не хватает денег', en: 'Not enough money' } }
-  if (a.once && s.actionCounts[actionId]) return { ok: false, reason: { ru: 'Уже сделано', en: 'Already done' } }
+  if (s.energy < cost) return { ok: false, reason: { ru: 'Не хватает энергии', en: 'Not enough energy', es: 'No hay energía suficiente', zh: '精力不足', pt: 'Energia insuficiente' } }
+  if (a.money && s.money < a.money) return { ok: false, reason: { ru: 'Не хватает денег', en: 'Not enough money', es: 'No hay dinero suficiente', zh: '钱不够', pt: 'Dinheiro insuficiente' } }
+  if (a.once && s.actionCounts[actionId]) return { ok: false, reason: { ru: 'Уже сделано', en: 'Already done', es: 'Ya está hecho', zh: '已经做过了', pt: 'Já feito' } }
   if (a.perDay && s.todayActions.filter((t) => t.id === actionId).length >= a.perDay)
-    return { ok: false, reason: { ru: 'Хватит на сегодня', en: 'Enough for today' } }
+    return { ok: false, reason: { ru: 'Хватит на сегодня', en: 'Enough for today', es: 'Suficiente por hoy', zh: '今天够了', pt: 'Chega por hoje' } }
   switch (actionId) {
     case 'add_feature':
     case 'deploy':
     // продвижение заблокировано, пока нет продукта — нечего продвигать
     case 'post':
     case 'ads':
-      if (s.progress < 100) return { ok: false, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first' } }
+      if (s.progress < 100) return { ok: false, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first', es: 'Primero termina el MVP', zh: '先把 MVP 做完', pt: 'Termine o MVP primeiro' } }
       break
     case 'landing':
-      if (s.landing >= 1) return { ok: false, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect' } }
+      if (s.landing >= 1) return { ok: false, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect', es: 'La landing ya es perfecta', zh: '落地页已经完美了', pt: 'A landing já está perfeita' } }
       break
     case 'launch':
-      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first' } }
+      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
       break
     case 'payments':
-      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first' } }
+      if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first', es: 'Primero haz deploy', zh: '先部署', pt: 'Faça o deploy primeiro' } }
       break
     case 'fix_bugs':
-      if (s.bugs <= 0) return { ok: false, reason: { ru: 'Багов нет (пока)', en: 'No bugs (yet)' } }
+      if (s.bugs <= 0) return { ok: false, reason: { ru: 'Багов нет (пока)', en: 'No bugs (yet)', es: 'No hay bugs (todavía)', zh: '没有 bug（暂时）', pt: 'Sem bugs (por enquanto)' } }
       break
     case 'talk_users':
-      if (s.stats.totalSignups <= 0) return { ok: false, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users' } }
+      if (s.stats.totalSignups <= 0) return { ok: false, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users', es: 'No hay con quién hablar: no hay usuarios', zh: '没人可聊：还没有用户', pt: 'Ninguém para conversar: sem usuários' } }
       break
     case 'hire': {
-      if (stageOf(s) !== 'traction') return { ok: false, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)' } }
+      if (stageOf(s) !== 'traction') return { ok: false, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)', es: 'Se desbloquea en la etapa Tracción ($1k MRR)', zh: '增长阶段解锁（$1k MRR）', pt: 'Desbloqueado na fase Tração ($1k MRR)' } }
       const h = p ? hireById(String(p)) : null
-      if (h && s.hires.includes(h.id)) return { ok: false, reason: { ru: 'Уже в команде', en: 'Already on the team' } }
-      if (h && s.money < h.monthly) return { ok: false, reason: { ru: 'Не хватает денег на первый месяц', en: 'Cannot afford the first month' } }
-      if (!p && HIRES.every((x) => s.hires.includes(x.id))) return { ok: false, reason: { ru: 'Все уже наняты', en: 'Everyone is hired' } }
+      if (h && s.hires.includes(h.id)) return { ok: false, reason: { ru: 'Уже в команде', en: 'Already on the team', es: 'Ya está en el equipo', zh: '已经在团队里了', pt: 'Já está no time' } }
+      if (h && s.money < h.monthly) return { ok: false, reason: { ru: 'Не хватает денег на первый месяц', en: 'Cannot afford the first month', es: 'No alcanza para el primer mes', zh: '付不起第一个月', pt: 'Não dá para pagar o primeiro mês' } }
+      if (!p && HIRES.every((x) => s.hires.includes(x.id))) return { ok: false, reason: { ru: 'Все уже наняты', en: 'Everyone is hired', es: 'Ya contrataste a todos', zh: '所有人都雇了', pt: 'Todos já foram contratados' } }
       break
     }
   }
@@ -167,17 +167,17 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
   switch (actionId) {
     case 'research_niche':
       s.validated = true
-      log(s, { ru: `Валидация: спрос ${Math.round(n.demand * 100)}/100, конкуренция ${Math.round(n.competition * 100)}/100, потолок цены ~$${n.arpuCap}`, en: `Validation: demand ${Math.round(n.demand * 100)}/100, competition ${Math.round(n.competition * 100)}/100, price cap ~$${n.arpuCap}` }, 'good')
+      log(s, { ru: `Валидация: спрос ${Math.round(n.demand * 100)}/100, конкуренция ${Math.round(n.competition * 100)}/100, потолок цены ~$${n.arpuCap}`, en: `Validation: demand ${Math.round(n.demand * 100)}/100, competition ${Math.round(n.competition * 100)}/100, price cap ~$${n.arpuCap}`, es: `Validación: demanda ${Math.round(n.demand * 100)}/100, competencia ${Math.round(n.competition * 100)}/100, techo de precio ~$${n.arpuCap}`, zh: `验证结果：需求 ${Math.round(n.demand * 100)}/100，竞争 ${Math.round(n.competition * 100)}/100，价格上限 ~$${n.arpuCap}`, pt: `Validação: demanda ${Math.round(n.demand * 100)}/100, concorrência ${Math.round(n.competition * 100)}/100, teto de preço ~$${n.arpuCap}` }, 'good')
       break
     case 'research_competitor':
       s.donorResearched = true
-      log(s, { ru: 'Изучил донора: фичи, цены, отзывы. Копировать — не стыдно, стыдно — придумывать.', en: 'Studied the donor: features, prices, reviews. Copying is fine; inventing is the sin.' }, 'good')
+      log(s, { ru: 'Изучил донора: фичи, цены, отзывы. Копировать — не стыдно, стыдно — придумывать.', en: 'Studied the donor: features, prices, reviews. Copying is fine; inventing is the sin.', es: 'Estudiaste al competidor donante: features, precios, reseñas. Copiar no da vergüenza; inventar, sí.', zh: '研究了对标产品：功能、价格、评价。抄不丢人，瞎编才丢人。', pt: 'Estudou o concorrente-doador: features, preços, reviews. Copiar não é vergonha; inventar é que é.' }, 'good')
       break
     case 'build_mvp':
       if (s.progress < 100) {
         s.progress = Math.min(100, s.progress + BAL.mvpProgressPerAction)
         s.quality = clamp(s.quality + BAL.mvpQualityPerAction, 0, 1)
-        if (s.progress >= 100) log(s, { ru: 'MVP готов! Можно деплоить. Или добавить ещё одну фичу (не надо)', en: 'MVP is done! Time to deploy. Or add one more feature (don\'t)' }, 'good')
+        if (s.progress >= 100) log(s, { ru: 'MVP готов! Можно деплоить. Или добавить ещё одну фичу (не надо)', en: 'MVP is done! Time to deploy. Or add one more feature (don\'t)', es: '¡MVP listo! Hora del deploy. O de añadir una feature más (no lo hagas)', zh: 'MVP 完成了！可以部署了。或者再加一个功能（别）', pt: 'MVP pronto! Hora do deploy. Ou de adicionar mais uma feature (não faça isso)' }, 'good')
       } else {
         s.quality = clamp(s.quality + 0.02, 0, 1)
       }
@@ -190,7 +190,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
         s.quality = clamp(s.quality + BAL.featureQualityLate, 0, 1)
         if (rand(s) < BAL.featureBugChanceLate) {
           s.bugs += 1
-          log(s, { ru: 'Ещё одна фича — ещё один баг. Кто бы мог подумать.', en: 'One more feature — one more bug. Who could have guessed.' }, 'bad')
+          log(s, { ru: 'Ещё одна фича — ещё один баг. Кто бы мог подумать.', en: 'One more feature — one more bug. Who could have guessed.', es: 'Una feature más — un bug más. Quién lo hubiera imaginado.', zh: '多一个功能，多一个 bug。真是万万没想到。', pt: 'Mais uma feature — mais um bug. Quem diria.' }, 'bad')
         }
       }
       break
@@ -200,7 +200,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
     case 'deploy':
       s.deployed = true
       s.infraMonthly += 20
-      log(s, { ru: 'Продукт в проде на Wyvercel. Теперь он может падать по-настоящему.', en: 'Deployed to Wyvercel. Now it can crash for real.' }, 'good')
+      log(s, { ru: 'Продукт в проде на Wyvercel. Теперь он может падать по-настоящему.', en: 'Deployed to Wyvercel. Now it can crash for real.', es: 'Desplegado en Wyvercel. Ahora puede caerse de verdad.', zh: '已部署到 Wyvercel。现在它可以真正地宕机了。', pt: 'No ar na Wyvercel. Agora ele pode cair de verdade.' }, 'good')
       break
     case 'landing':
       // минимальный шаг 0.04 — иначе асимптота застревает на «99%»
@@ -228,24 +228,24 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       const happy = s.quality >= 0.4 && s.bugs < 3
       s.motivation = clamp(s.motivation + (happy ? BAL.talkMotivationHappy : BAL.talkMotivationSad), 0, 100)
       log(s, happy
-        ? { ru: 'Юзеры в целом довольны. Записал пару инсайтов.', en: 'Users are mostly happy. Wrote down a couple of insights.' }
-        : { ru: 'Юзеры жалуются на качество. Больно, но полезно.', en: 'Users complain about quality. Painful but useful.' }, happy ? 'good' : 'bad')
+        ? { ru: 'Юзеры в целом довольны. Записал пару инсайтов.', en: 'Users are mostly happy. Wrote down a couple of insights.', es: 'Los usuarios están contentos en general. Anotaste un par de insights.', zh: '用户总体还算满意。记下了几条洞察。', pt: 'Os usuários estão satisfeitos no geral. Anotou alguns insights.' }
+        : { ru: 'Юзеры жалуются на качество. Больно, но полезно.', en: 'Users complain about quality. Painful but useful.', es: 'Los usuarios se quejan de la calidad. Duele, pero sirve.', zh: '用户在抱怨质量。很痛，但有用。', pt: 'Os usuários reclamam da qualidade. Dói, mas é útil.' }, happy ? 'good' : 'bad')
       break
     }
     case 'set_price': {
       const newPrice = Math.max(1, Math.round(Number(p) || s.price))
       s.price = newPrice
       s.mrr = s.paid * s.price
-      log(s, { ru: `Новая цена: $${newPrice}/мес`, en: `New price: $${newPrice}/mo` })
+      log(s, { ru: `Новая цена: $${newPrice}/мес`, en: `New price: $${newPrice}/mo`, es: `Nuevo precio: $${newPrice}/mes`, zh: `新价格：$${newPrice}/月`, pt: `Novo preço: $${newPrice}/mês` })
       break
     }
     case 'payments':
       s.payments = true
-      log(s, { ru: 'Gold Golem Pay подключён. Голем берёт 2.9% + жертвоприношение.', en: 'Gold Golem Pay connected. The golem takes 2.9% + a small sacrifice.' }, 'good')
+      log(s, { ru: 'Gold Golem Pay подключён. Голем берёт 2.9% + жертвоприношение.', en: 'Gold Golem Pay connected. The golem takes 2.9% + a small sacrifice.', es: 'Gold Golem Pay conectado. El gólem cobra 2.9% + un pequeño sacrificio.', zh: 'Gold Golem Pay 已接入。石魔收取 2.9% 外加一点祭品。', pt: 'Gold Golem Pay conectado. O golem cobra 2.9% + um pequeno sacrifício.' }, 'good')
       break
     case 'metrics':
       s.analytics = true
-      log(s, { ru: 'Аналитика открыта: CAC, LTV, churn — теперь на дашборде.', en: 'Analytics unlocked: CAC, LTV, churn — now on the dashboard.' }, 'good')
+      log(s, { ru: 'Аналитика открыта: CAC, LTV, churn — теперь на дашборде.', en: 'Analytics unlocked: CAC, LTV, churn — now on the dashboard.', es: 'Analítica desbloqueada: CAC, LTV, churn — ahora en el dashboard.', zh: '数据分析已解锁：CAC、LTV、churn 都上仪表盘了。', pt: 'Analytics desbloqueado: CAC, LTV, churn — agora no dashboard.' }, 'good')
       break
     case 'rest':
       s.restToday = true
@@ -255,7 +255,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
     case 'hire': {
       const h = hireById(String(p))
       s.hires.push(h.id)
-      log(s, { ru: `${h.name.ru} в команде (+$${h.monthly}/мес)`, en: `${h.name.en} joined (+$${h.monthly}/mo)` }, 'good')
+      log(s, { ru: `${h.name.ru} в команде (+$${h.monthly}/мес)`, en: `${h.name.en} joined (+$${h.monthly}/mo)`, es: `${h.name.es ?? h.name.en} se unió al equipo (+$${h.monthly}/mes)`, zh: `${h.name.zh ?? h.name.en} 加入了团队（+$${h.monthly}/月）`, pt: `${h.name.pt ?? h.name.en} entrou no time (+$${h.monthly}/mês)` }, 'good')
       break
     }
   }
@@ -397,25 +397,25 @@ export function endDay(state: GameState): GameState {
     s.crunchStreak += 1
     if (s.crunchStreak >= BAL.crunchAfterDays) {
       s.motivation = clamp(s.motivation - BAL.crunchPenaltyPerDay * b.motLossMult, 0, 100)
-      log(s, { ru: 'Кранч который день подряд. Внутренний огонёк коптит.', en: 'Crunching for days in a row. The inner flame is smoking.' }, 'bad')
+      log(s, { ru: 'Кранч который день подряд. Внутренний огонёк коптит.', en: 'Crunching for days in a row. The inner flame is smoking.', es: 'Crunch un día tras otro. La llamita interior echa humo.', zh: '连轴加班好几天了。内心的小火苗开始冒黑烟。', pt: 'Crunch um dia atrás do outro. A chaminha interior está soltando fumaça.' }, 'bad')
     }
   } else if (s.restToday || s.energy >= s.energyMax * 0.5) {
     s.crunchStreak = 0
   }
   if (s.launchToday && signups === 0) {
     s.motivation = clamp(s.motivation - BAL.launchFlopPenalty * b.motLossMult, 0, 100)
-    log(s, { ru: 'Лонч в пустоту. Ноль регистраций. Классика жанра.', en: 'Launched into the void. Zero signups. A genre classic.' }, 'bad')
+    log(s, { ru: 'Лонч в пустоту. Ноль регистраций. Классика жанра.', en: 'Launched into the void. Zero signups. A genre classic.', es: 'Lanzamiento al vacío. Cero registros. Un clásico del género.', zh: '发布进了虚空。零注册。业界经典。', pt: 'Lançamento no vazio. Zero cadastros. Um clássico do gênero.' }, 'bad')
   }
   if (newPaid > 0 && !s.firstPaidSeen) {
     s.firstPaidSeen = true
     s.motivation = clamp(s.motivation + BAL.firstPaidBonus, 0, 100)
-    log(s, { ru: 'ПЕРВЫЙ ПЛАТЯЩИЙ КЛИЕНТ! Скриншот. В рамку. На стену.', en: 'FIRST PAYING CUSTOMER! Screenshot it. Frame it. Wall it.' }, 'good')
+    log(s, { ru: 'ПЕРВЫЙ ПЛАТЯЩИЙ КЛИЕНТ! Скриншот. В рамку. На стену.', en: 'FIRST PAYING CUSTOMER! Screenshot it. Frame it. Wall it.', es: '¡PRIMER CLIENTE DE PAGO! Captura. Marco. Pared.', zh: '第一个付费用户！截图。装裱。挂墙上。', pt: 'PRIMEIRO CLIENTE PAGANTE! Print. Moldura. Parede.' }, 'good')
   }
   for (const ms of BAL.milestonesMRR) {
     if (s.mrr >= ms && !s.milestones.includes(ms)) {
       s.milestones.push(ms)
       s.motivation = clamp(s.motivation + BAL.milestoneBonus, 0, 100)
-      log(s, { ru: `Веха: $${ms} MRR!`, en: `Milestone: $${ms} MRR!` }, 'good')
+      log(s, { ru: `Веха: $${ms} MRR!`, en: `Milestone: $${ms} MRR!`, es: `¡Hito: $${ms} MRR!`, zh: `里程碑：$${ms} MRR！`, pt: `Marco: $${ms} MRR!` }, 'good')
     }
   }
 
@@ -424,6 +424,9 @@ export function endDay(state: GameState): GameState {
     log(s, {
       ru: `+${visits} визитов, +${signups} регистраций, +${newPaid} платящих, −${churned} отписок`,
       en: `+${visits} visits, +${signups} signups, +${newPaid} paid, −${churned} churned`,
+      es: `+${visits} visitas, +${signups} registros, +${newPaid} de pago, −${churned} bajas`,
+      zh: `+${visits} 访问，+${signups} 注册，+${newPaid} 付费，−${churned} 流失`,
+      pt: `+${visits} visitas, +${signups} cadastros, +${newPaid} pagantes, −${churned} cancelamentos`,
     })
   }
   // ироничный коммент к итогу дня

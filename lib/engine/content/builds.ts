@@ -3,10 +3,13 @@ import type { BuildDef } from '../types'
 export const BUILDS: BuildDef[] = [
   {
     id: 'coder',
-    name: { ru: 'Кодер', en: 'Coder' },
+    name: { ru: 'Кодер', en: 'Coder', es: 'Programador', zh: '码农', pt: 'Programador' },
     desc: {
       ru: 'Разработка −50% энергии, маркетинг +50%. Аудитория: 0. «Сейчас всё перепишу на Rust»',
       en: 'Dev −50% energy, marketing +50%. Audience: 0. "Let me just rewrite it in Rust"',
+      es: 'Desarrollo −50% de energía, marketing +50%. Audiencia: 0. "Ahora mismo lo reescribo todo en Rust"',
+      zh: '开发 −50% 精力，营销 +50%。受众：0。"让我先用 Rust 全部重写一遍"',
+      pt: 'Dev −50% de energia, marketing +50%. Audiência: 0. "Deixa eu só reescrever tudo em Rust"',
     },
     icon: '⌨️',
     money: 4000,
@@ -18,10 +21,13 @@ export const BUILDS: BuildDef[] = [
   },
   {
     id: 'marketer',
-    name: { ru: 'Маркетолог', en: 'Marketer' },
+    name: { ru: 'Маркетолог', en: 'Marketer', es: 'Marketer', zh: '营销人', pt: 'Marketeiro' },
     desc: {
       ru: 'Маркетинг −50% энергии, разработка +50%. Аудитория: 500. «Лендинг уже есть, продукт потом»',
       en: 'Marketing −50% energy, dev +50%. Audience: 500. "Landing page first, product later"',
+      es: 'Marketing −50% de energía, desarrollo +50%. Audiencia: 500. "Primero la landing, el producto después"',
+      zh: '营销 −50% 精力，开发 +50%。受众：500。"落地页先上，产品以后再说"',
+      pt: 'Marketing −50% de energia, dev +50%. Audiência: 500. "Primeiro a landing page, o produto depois"',
     },
     icon: '📣',
     money: 4000,
@@ -33,10 +39,13 @@ export const BUILDS: BuildDef[] = [
   },
   {
     id: 'generalist',
-    name: { ru: 'Универсал', en: 'Generalist' },
+    name: { ru: 'Универсал', en: 'Generalist', es: 'Generalista', zh: '全能型', pt: 'Generalista' },
     desc: {
       ru: 'Без модификаторов, но больше денег. «Средний во всём — это тоже суперсила»',
       en: 'No modifiers, more money. "Mediocre at everything is also a superpower"',
+      es: 'Sin modificadores, pero más dinero. "Mediocre en todo también es un superpoder"',
+      zh: '没有加成，但钱更多。"样样平庸也是一种超能力"',
+      pt: 'Sem modificadores, mas mais dinheiro. "Mediano em tudo também é um superpoder"',
     },
     icon: '🧰',
     money: 6000,
@@ -48,10 +57,13 @@ export const BUILDS: BuildDef[] = [
   },
   {
     id: 'excorp',
-    name: { ru: 'Экс-корпорат', en: 'Ex-corporate' },
+    name: { ru: 'Экс-корпорат', en: 'Ex-corporate', es: 'Ex-corporativo', zh: '前大厂人', pt: 'Ex-corporativo' },
     desc: {
       ru: 'Много денег, но всё +25% энергии (отвык от рук) и мотивация тает быстрее. «В Google было проще»',
       en: 'Lots of money, but everything costs +25% energy and motivation drains faster. "It was easier at Google"',
+      es: 'Mucho dinero, pero todo cuesta +25% de energía (perdió la práctica) y la motivación se agota más rápido. "En Google era más fácil"',
+      zh: '钱很多，但做什么都 +25% 精力（手生了），动力流失也更快。"在 Google 的时候可轻松多了"',
+      pt: 'Muito dinheiro, mas tudo custa +25% de energia (perdeu a prática) e a motivação derrete mais rápido. "No Google era mais fácil"',
     },
     icon: '👔',
     money: 12000,

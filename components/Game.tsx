@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '@/lib/store'
 import { t, tl } from '@/lib/i18n'
+import { LANGS, LANG_LABELS } from '@/lib/engine/types'
 import { BUILDS } from '@/lib/engine/content/builds'
 import { nicheById } from '@/lib/engine/content/niches'
 import { CHARACTERS, FOUNDERS } from '@/lib/engine/content/characters'
@@ -27,12 +28,17 @@ export default function Game() {
 function LangToggle() {
   const { lang, setLang } = useStore()
   return (
-    <button
-      className="pbtn px-3 py-1 text-xs pixel-font"
-      onClick={() => setLang(lang === 'ru' ? 'en' : 'ru')}
-    >
-      {lang === 'ru' ? 'RU → EN' : 'EN → RU'}
-    </button>
+    <div className="flex gap-1.5 flex-wrap justify-center">
+      {LANGS.map((l) => (
+        <button
+          key={l}
+          className={`pbtn px-2.5 py-1 text-xs pixel-font ${lang === l ? 'pbtn-accent' : ''}`}
+          onClick={() => setLang(l)}
+        >
+          {LANG_LABELS[l]}
+        </button>
+      ))}
+    </div>
   )
 }
 
@@ -62,7 +68,7 @@ function Title() {
         {canContinue && (
           <button className="pbtn px-4 py-3 pixel-font text-xs" onClick={continueRun}>
             {t(lang, 'continueRun')} (
-            {lang === 'ru' ? 'день' : 'day'} {game.day})
+            {t(lang, 'dayLower')} {game.day})
           </button>
         )}
         <div className="flex justify-center gap-2">
@@ -122,7 +128,7 @@ function IdeaPick() {
               </div>
               <div className="text-sm text-[var(--muted)] grow">{tl(lang, n.legend)}</div>
               <div className="text-xs text-[var(--muted)]">
-                {lang === 'ru' ? 'Спрос' : 'Demand'}: ??? · {lang === 'ru' ? 'Конкуренция' : 'Competition'}: ???
+                {t(lang, 'demand')}: ??? · {t(lang, 'competition')}: ???
               </div>
             </button>
           )

@@ -1,5 +1,8 @@
-export type Lang = 'ru' | 'en'
-export type L = { ru: string; en: string }
+export type Lang = 'ru' | 'en' | 'es' | 'zh' | 'pt'
+// ru/en обязательны; остальные — с фолбэком на en
+export type L = { ru: string; en: string } & Partial<Record<'es' | 'zh' | 'pt', string>>
+export const LANGS: Lang[] = ['ru', 'en', 'es', 'zh', 'pt']
+export const LANG_LABELS: Record<Lang, string> = { ru: 'RU', en: 'EN', es: 'ES', zh: '中文', pt: 'PT' }
 
 export type ChannelId = 'seo' | 'social' | 'forum'
 export type Stage = 'garage' | 'traction'

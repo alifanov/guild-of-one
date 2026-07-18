@@ -105,7 +105,7 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
         <Row k={t(lang, 'visits')} v={`${g.lastVisits}`} />
         <Row k={t(lang, 'signups')} v={`${g.lastSignups}`} sub={`(${(m.convLp * 100).toFixed(1)}%)`} />
         <Row k={t(lang, 'paying')} v={`${g.paid}`} sub={`+${g.lastNewPaid}/−${g.lastChurned}`} />
-        <Row k={t(lang, 'churn')} v={`${(m.churnMonthly * 100).toFixed(0)}%`} sub={lang === 'ru' ? '/мес' : '/mo'} />
+        <Row k={t(lang, 'churn')} v={`${(m.churnMonthly * 100).toFixed(0)}%`} sub={t(lang, 'perMonth')} />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
@@ -146,9 +146,7 @@ function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
       </div>
       {active.length >= 2 && (
         <div className="text-xs text-[var(--bad)] mt-2">
-          {lang === 'ru'
-            ? `⚠ ${active.length} активных канала — эффективность каждого падает`
-            : `⚠ ${active.length} active channels — each one loses efficiency`}
+          {`⚠ ${active.length} ${t(lang, 'multiChannelWarn')}`}
         </div>
       )}
       {g.hires.length > 0 && (
@@ -181,7 +179,7 @@ function ProductPanel({ g, lang }: { g: GameState; lang: Lang }) {
       <div className="text-sm mb-1">{tl(lang, n.name)}</div>
       <div className="text-xs text-[var(--muted)] mb-2">
         {g.validated
-          ? `${lang === 'ru' ? 'Спрос' : 'Demand'} ${Math.round(n.demand * 100)} · ${lang === 'ru' ? 'Конкуренция' : 'Competition'} ${Math.round(n.competition * 100)} · ${lang === 'ru' ? 'Потолок' : 'Cap'} $${n.arpuCap}`
+          ? `${t(lang, 'demand')} ${Math.round(n.demand * 100)} · ${t(lang, 'competition')} ${Math.round(n.competition * 100)} · ${t(lang, 'cap')} $${n.arpuCap}`
           : t(lang, 'pmfHint')}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -204,12 +202,12 @@ function ProductPanel({ g, lang }: { g: GameState; lang: Lang }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-1 mt-2">
         <Row k={t(lang, 'features')} v={`${g.features}`} sub={g.features > 3 ? '⚠' : ''} />
         <Row k={t(lang, 'bugs')} v={`${g.bugs}`} sub={g.bugs > 2 ? '🐛' : ''} />
-        <Row k={t(lang, 'price')} v={`$${g.price}`} sub={lang === 'ru' ? '/мес' : '/mo'} />
-        <Row k={t(lang, 'burn')} v={`$${burn.toLocaleString()}`} sub={lang === 'ru' ? '/мес' : '/mo'} />
+        <Row k={t(lang, 'price')} v={`$${g.price}`} sub={t(lang, 'perMonth')} />
+        <Row k={t(lang, 'burn')} v={`$${burn.toLocaleString()}`} sub={t(lang, 'perMonth')} />
         <Row k={t(lang, 'deployed')} v={g.deployed ? '✅' : '—'} />
         <Row k={t(lang, 'payments')} v={g.payments ? '✅' : '—'} />
         <Row k={t(lang, 'validated')} v={g.validated ? '✅' : '—'} />
-        <Row k={lang === 'ru' ? 'Лончей' : 'Launches'} v={`${g.launches}`} />
+        <Row k={t(lang, 'launches')} v={`${g.launches}`} />
       </div>
     </Panel>
   )

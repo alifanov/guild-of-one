@@ -23,7 +23,7 @@ export const PALETTE: Record<string, string> = {
 export const CHARACTERS: CharacterDef[] = [
   {
     id: 'gnome_devops',
-    name: { ru: 'Гном-девопс', en: 'Dwarf devops' },
+    name: { ru: 'Гном-девопс', en: 'Dwarf devops', es: 'Enano devops', zh: '矮人运维', pt: 'Anão devops' },
     sprite: [
       '.....rr.....',
       '....rrrr....',
@@ -41,7 +41,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'elf_designer',
-    name: { ru: 'Эльфийка-дизайнер', en: 'Elf designer' },
+    name: { ru: 'Эльфийка-дизайнер', en: 'Elf designer', es: 'Elfa diseñadora', zh: '精灵设计师', pt: 'Elfa designer' },
     sprite: [
       '....gggg....',
       '...gggggg...',
@@ -59,7 +59,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'dragon_investor',
-    name: { ru: 'Дракон-инвестор', en: 'Dragon investor' },
+    name: { ru: 'Дракон-инвестор', en: 'Dragon investor', es: 'Dragón inversor', zh: '投资人巨龙', pt: 'Dragão investidor' },
     sprite: [
       '..G......G..',
       '..GG....GG..',
@@ -77,7 +77,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'goblin_hater',
-    name: { ru: 'Гоблин-хейтер', en: 'Goblin hater' },
+    name: { ru: 'Гоблин-хейтер', en: 'Goblin hater', es: 'Goblin hater', zh: '黑粉哥布林', pt: 'Goblin hater' },
     sprite: [
       '..g......g..',
       '.gg......gg.',
@@ -95,7 +95,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'churn_demon',
-    name: { ru: 'Churn-демон', en: 'Churn demon' },
+    name: { ru: 'Churn-демон', en: 'Churn demon', es: 'Demonio del churn', zh: 'Churn 恶魔', pt: 'Demônio do churn' },
     sprite: [
       '.P........P.',
       '.PP......PP.',
@@ -113,7 +113,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'oracle_analyst',
-    name: { ru: 'Оракул-аналитик', en: 'Oracle analyst' },
+    name: { ru: 'Оракул-аналитик', en: 'Oracle analyst', es: 'Oráculo analista', zh: '神谕分析师', pt: 'Oráculo analista' },
     sprite: [
       '....BBBB....',
       '...BBBBBB...',
@@ -131,7 +131,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'support_goblin',
-    name: { ru: 'Саппорт-гоблин', en: 'Support goblin' },
+    name: { ru: 'Саппорт-гоблин', en: 'Support goblin', es: 'Goblin de soporte', zh: '客服哥布林', pt: 'Goblin de suporte' },
     sprite: [
       '..mmmmmmmm..',
       '.mggggggggm.',
@@ -149,7 +149,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'lich_competitor',
-    name: { ru: 'Лич-конкурент', en: 'Lich competitor' },
+    name: { ru: 'Лич-конкурент', en: 'Lich competitor', es: 'Liche competidor', zh: '巫妖竞争者', pt: 'Lich concorrente' },
     sprite: [
       '..y..y..y...',
       '..yyyyyyy...',
@@ -167,7 +167,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'tax_owl',
-    name: { ru: 'Налоговая сова', en: 'Tax owl' },
+    name: { ru: 'Налоговая сова', en: 'Tax owl', es: 'Búho fiscal', zh: '税务猫头鹰', pt: 'Coruja fiscal' },
     sprite: [
       '.nn......nn.',
       '.nnnnnnnnnn.',
@@ -185,7 +185,7 @@ export const CHARACTERS: CharacterDef[] = [
   },
   {
     id: 'paladin_fan',
-    name: { ru: 'Фанат-паладин', en: 'Paladin fan' },
+    name: { ru: 'Фанат-паладин', en: 'Paladin fan', es: 'Paladín fan', zh: '铁粉圣骑士', pt: 'Paladino fã' },
     sprite: [
       '....yyyy....',
       '...llllll...',

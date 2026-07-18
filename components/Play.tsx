@@ -469,7 +469,63 @@ function EndOverlay({ g, lang }: { g: GameState; lang: Lang }) {
             ⌂
           </button>
         </div>
+        <ShareRow g={g} lang={lang} won={won} />
       </div>
+    </div>
+  )
+}
+
+const GAME_URL = 'https://guildof.one'
+
+declare global {
+  interface Window {
+    plausible?: (event: string, opts?: { props?: Record<string, string> }) => void
+  }
+}
+
+function ShareRow({ g, lang, won }: { g: GameState; lang: Lang; won: boolean }) {
+  const [copied, setCopied] = useState(false)
+  const text = t(lang, won ? 'share_won' : 'share_lost')
+    .replace('{days}', String(g.day))
+    .replace('{mrr}', g.stats.peakMrr.toLocaleString())
+  const enc = encodeURIComponent
+  const nets: { id: string; icon: string; href: string }[] = [
+    { id: 'x', icon: '𝕏', href: `https://twitter.com/intent/tweet?text=${enc(`${text} ${GAME_URL}`)}` },
+    { id: 'telegram', icon: '✈', href: `https://t.me/share/url?url=${enc(GAME_URL)}&text=${enc(text)}` },
+    { id: 'reddit', icon: '👽', href: `https://www.reddit.com/submit?url=${enc(GAME_URL)}&title=${enc(text)}` },
+    { id: 'linkedin', icon: 'in', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(GAME_URL)}` },
+    { id: 'facebook', icon: 'f', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(GAME_URL)}&quote=${enc(text)}` },
+  ]
+  const track = (id: string) => window.plausible?.('share', { props: { network: id, result: won ? 'won' : 'lost' } })
+  return (
+    <div className="flex items-center gap-2 flex-wrap pt-1 border-t-2 border-[var(--border)]">
+      <span className="text-xs text-[var(--muted)]">{t(lang, 'shareRow')}</span>
+      {nets.map((n) => (
+        <a
+          key={n.id}
+          className="pbtn px-2.5 py-1.5 pixel-font text-[11px] no-underline"
+          href={n.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={n.id}
+          onClick={() => track(n.id)}
+        >
+          {n.icon}
+        </a>
+      ))}
+      <button
+        className="pbtn px-2.5 py-1.5 pixel-font text-[11px]"
+        title="copy"
+        onClick={() => {
+          navigator.clipboard.writeText(`${text} ${GAME_URL}`).then(() => {
+            setCopied(true)
+            track('copy')
+            setTimeout(() => setCopied(false), 1500)
+          })
+        }}
+      >
+        {copied ? `✓ ${t(lang, 'copied')}` : '📋'}
+      </button>
     </div>
   )
 }

@@ -491,6 +491,21 @@ function checkEndConditions(s: GameState) {
   else if (s.motivation <= 0) s.status = 'lost_burnout'
 }
 
+// фаундер сдался сам — не поражение по ресурсам, отдельная концовка
+export function giveUp(state: GameState): GameState {
+  if (state.status !== 'playing') return state
+  const s = structuredClone(state)
+  s.status = 'shutdown'
+  log(s, {
+    ru: 'Продукт закрыт решением основателя. Совет директоров (ты) единогласен.',
+    en: 'Product shut down by founder decision. The board (you) voted unanimously.',
+    es: 'Producto cerrado por decisión del fundador. La junta (tú) votó por unanimidad.',
+    zh: '创始人决定关停产品。董事会（你）全票通过。',
+    pt: 'Produto encerrado por decisão do fundador. O conselho (você) votou por unanimidade.',
+  })
+  return s
+}
+
 // «повторить день ×7»: реплей действий текущего дня, прерывается событием/порогами
 export function fastForward(state: GameState): GameState {
   if (state.status !== 'playing' || state.pendingEvent) return state

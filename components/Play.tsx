@@ -214,9 +214,10 @@ function ProductPanel({ g, lang }: { g: GameState; lang: Lang }) {
 }
 
 function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: string }) {
-  const { act, finishDay } = useStore()
+  const { act, finishDay, shutdown } = useStore()
   const [expand, setExpand] = useState<string | null>(null)
   const [price, setPrice] = useState(g.price)
+  const [confirmClose, setConfirmClose] = useState(false)
   const visible = ACTIONS.filter((a) => (a.id === 'hire' ? stage === 'traction' : true))
   return (
     <Panel title={t(lang, 'actions')} className="lg:sticky lg:top-16">
@@ -309,13 +310,21 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
           )
         })}
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex flex-col gap-2">
         <button
           className="pbtn pbtn-accent w-full px-3 py-2 pixel-font text-[10px]"
           onClick={finishDay}
           disabled={!!g.pendingEvent}
         >
           {t(lang, 'endDay')} ▶
+        </button>
+        <button
+          className={`pbtn w-full px-3 py-2 pixel-font text-[10px] ${confirmClose ? 'text-[var(--bad)] border-[var(--bad)]' : 'text-[var(--muted)]'}`}
+          onClick={() => (confirmClose ? shutdown() : setConfirmClose(true))}
+          onBlur={() => setConfirmClose(false)}
+          disabled={!!g.pendingEvent}
+        >
+          {confirmClose ? `⚠ ${t(lang, 'confirmClose')}` : `🪦 ${t(lang, 'closeProduct')}`}
         </button>
       </div>
     </Panel>
@@ -387,7 +396,9 @@ function EndOverlay({ g, lang }: { g: GameState; lang: Lang }) {
         ? t(lang, 'verdict_money')
         : g.status === 'lost_burnout'
           ? t(lang, 'verdict_burnout')
-          : t(lang, 'verdict_quit')
+          : g.status === 'shutdown'
+            ? t(lang, 'verdict_shutdown')
+            : t(lang, 'verdict_quit')
   const download = () => {
     const cv = document.createElement('canvas')
     cv.width = 800

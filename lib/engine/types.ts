@@ -6,7 +6,7 @@ export const LANG_LABELS: Record<Lang, string> = { ru: 'RU', en: 'EN', es: 'ES',
 
 export type ChannelId = 'seo' | 'social' | 'forum'
 export type Stage = 'garage' | 'traction'
-export type Status = 'playing' | 'won' | 'lost_money' | 'lost_burnout' | 'quit_job'
+export type Status = 'playing' | 'won' | 'lost_money' | 'lost_burnout' | 'quit_job' | 'shutdown'
 
 export interface NicheDef {
   id: string

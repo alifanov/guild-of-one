@@ -22,7 +22,7 @@ export default function Play() {
   if (!g) return null
   const stage = stageOf(g)
   return (
-    <div className="max-w-6xl mx-auto p-2 sm:p-4 flex flex-col gap-3">
+    <div className="max-w-7xl mx-auto p-2 sm:p-4 flex flex-col gap-3">
       <Header g={g} lang={lang} />
       {/* мобильные табы */}
       <div className="flex gap-2 lg:hidden">
@@ -36,15 +36,20 @@ export default function Play() {
           </button>
         ))}
       </div>
+      {/* desktop xl: левая часть в 2 колонки, чтобы всё влезало без скролла */}
       <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-3 flex flex-col gap-3">
-        <div className="flex flex-col gap-3 min-w-0">
-          <div className={`${tab === 'funnel' ? 'flex' : 'hidden'} lg:flex flex-col gap-3`}>
+        <div className="flex flex-col gap-3 min-w-0 xl:grid xl:grid-cols-2 xl:items-start">
+          <div className={`${tab === 'funnel' ? 'block' : 'hidden'} lg:block xl:col-start-1`}>
             <FunnelPanel g={g} lang={lang} />
-            <ChannelsPanel g={g} lang={lang} />
+          </div>
+          <div className={`${tab === 'product' ? 'block' : 'hidden'} lg:block xl:col-start-2 xl:row-start-1`}>
+            <ProductPanel g={g} lang={lang} />
+          </div>
+          <div className={`${tab === 'funnel' ? 'block' : 'hidden'} lg:block xl:col-start-1`}>
             <InsightsPanel g={g} lang={lang} />
           </div>
-          <div className={`${tab === 'product' ? 'flex' : 'hidden'} lg:flex flex-col gap-3`}>
-            <ProductPanel g={g} lang={lang} />
+          <div className={`${tab === 'funnel' ? 'block' : 'hidden'} lg:block xl:col-start-2`}>
+            <ChannelsPanel g={g} lang={lang} />
           </div>
         </div>
         <div className={`${tab === 'actions' ? 'flex' : 'hidden'} lg:flex flex-col gap-3`}>

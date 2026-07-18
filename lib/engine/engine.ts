@@ -6,6 +6,7 @@ import { nicheById } from './content/niches'
 import { actionById } from './content/actions'
 import { hireById, HIRES } from './content/hires'
 import { EVENTS } from './content/events'
+import { FLAVOR } from './content/flavor'
 
 export const SAVE_VERSION = 1
 
@@ -425,6 +426,19 @@ export function endDay(state: GameState): GameState {
       en: `+${visits} visits, +${signups} signups, +${newPaid} paid, −${churned} churned`,
     })
   }
+  // ироничный коммент к итогу дня
+  const flavorGroup =
+    churned > newPaid && churned >= 2 ? 'churnHeavy'
+    : newPaid > 0 ? 'newPaid'
+    : s.money < 500 ? 'moneyLow'
+    : signups > 0 && s.payments ? 'signupsNoPaid'
+    : visits > 0 && signups === 0 ? 'visitsNoSignups'
+    : visits === 0 && s.launches > 0 ? 'zeroVisits'
+    : !s.deployed ? 'building'
+    : 'quiet'
+  const pool = FLAVOR[flavorGroup]
+  const flavorTone = flavorGroup === 'newPaid' ? 'good' : flavorGroup === 'churnHeavy' || flavorGroup === 'moneyLow' ? 'bad' : 'info'
+  log(s, pool[Math.floor(rand(s) * pool.length)], flavorTone)
 
   // тик модификаторов
   s.mods = s.mods.map((mod) => ({ ...mod, days: mod.days - 1 })).filter((mod) => mod.days > 0)

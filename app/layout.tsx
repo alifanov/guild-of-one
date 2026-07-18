@@ -10,8 +10,23 @@ const pixel = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://guildof.one'),
   title: 'Guild of One — соло-фаундер roguelike',
   description: 'Пошаговый roguelike-симулятор запуска продукта соло-основателем. От идеи до $10k MRR или смерти.',
+  openGraph: {
+    title: 'Guild of One',
+    description: 'Solo founder roguelike — from idea to $10k MRR or death.',
+    url: 'https://guildof.one',
+    siteName: 'Guild of One',
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Guild of One',
+    description: 'Solo founder roguelike — from idea to $10k MRR or death.',
+    images: ['/og.png'],
+  },
 }
 
 export const viewport: Viewport = {

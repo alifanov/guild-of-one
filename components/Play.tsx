@@ -38,7 +38,7 @@ export default function Play() {
       </div>
       {/* desktop xl: левая часть в 2 колонки, чтобы всё влезало без скролла */}
       <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-3 flex flex-col gap-3">
-        <div className="flex flex-col gap-3 min-w-0 xl:grid xl:grid-cols-2 xl:items-start">
+        <div className="flex flex-col gap-3 min-w-0 xl:grid xl:grid-cols-2">
           <div className={`${tab === 'funnel' ? 'block' : 'hidden'} lg:block xl:col-start-1`}>
             <FunnelPanel g={g} lang={lang} />
           </div>
@@ -107,7 +107,7 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const cacPaid = m.convLp * m.convPay > 0 ? m.cpv / (m.convLp * m.convPay) : 0
   const ltv = m.churnMonthly > 0 ? g.price / m.churnMonthly : 0
   return (
-    <Panel title={t(lang, 'funnel')}>
+    <Panel title={t(lang, 'funnel')} className="h-full">
       <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
         <Row k={t(lang, 'visits')} v={`${g.lastVisits}`} />
         <Row k={t(lang, 'signups')} v={`${g.lastSignups}`} sub={`(${(m.convLp * 100).toFixed(1)}%)`} />
@@ -139,7 +139,7 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
 function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const active = CHANNEL_IDS.filter((c) => g.channels[c] > BAL.activeChannelThreshold)
   return (
-    <Panel title={t(lang, 'channels')}>
+    <Panel title={t(lang, 'channels')} className="h-full">
       <div className="flex flex-col gap-2">
         {CHANNEL_IDS.map((c) => (
           <div key={c} className="flex items-center gap-2">
@@ -180,7 +180,7 @@ function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
 function InsightsPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const unlocked = (g.insights ?? []).map((id) => insightById(id)).filter(Boolean)
   return (
-    <Panel title={`💡 ${t(lang, 'insightsTitle')}${unlocked.length ? ` (${unlocked.length})` : ''}`}>
+    <Panel title={`💡 ${t(lang, 'insightsTitle')}${unlocked.length ? ` (${unlocked.length})` : ''}`} className="h-full">
       {unlocked.length === 0 ? (
         <div className="text-xs text-[var(--muted)]">{t(lang, 'insightsHint')}</div>
       ) : (
@@ -188,6 +188,17 @@ function InsightsPanel({ g, lang }: { g: GameState; lang: Lang }) {
           {unlocked.map((ins) => (
             <div key={ins!.id} className="text-[var(--good)]">
               {tl(lang, ins!.text(g))}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* скелетон будущих инсайтов — заполняет пустоту и намекает «будет ещё» */}
+      {unlocked.length > 0 && (
+        <div className="flex flex-col gap-2 mt-2 opacity-40" title={t(lang, 'insightsHint')}>
+          {[0, 1].map((i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="grayscale">💡</span>
+              <div className="h-2.5 bg-[var(--panel2)] animate-pulse" style={{ width: `${60 - i * 15}%` }} />
             </div>
           ))}
         </div>
@@ -201,7 +212,7 @@ function ProductPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const hiresMonthly = g.hires.reduce((a, h) => a + hireById(h).monthly, 0)
   const burn = BAL.burnLifeMonthly + g.infraMonthly + hiresMonthly
   return (
-    <Panel title={t(lang, 'product')}>
+    <Panel title={t(lang, 'product')} className="h-full">
       <div className="text-sm mb-1">{tl(lang, n.name)}</div>
       <div className="text-xs text-[var(--muted)] mb-2">
         {g.validated

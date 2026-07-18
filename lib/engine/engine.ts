@@ -115,7 +115,13 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
   switch (actionId) {
     case 'add_feature':
     case 'deploy':
+    // продвижение заблокировано, пока нет продукта — нечего продвигать
+    case 'post':
+    case 'ads':
       if (s.progress < 100) return { ok: false, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first' } }
+      break
+    case 'landing':
+      if (s.landing >= 1) return { ok: false, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect' } }
       break
     case 'launch':
       if (!s.deployed) return { ok: false, reason: { ru: 'Сначала задеплой', en: 'Deploy first' } }
@@ -196,7 +202,8 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       log(s, { ru: 'Продукт в проде на Wyvercel. Теперь он может падать по-настоящему.', en: 'Deployed to Wyvercel. Now it can crash for real.' }, 'good')
       break
     case 'landing':
-      s.landing = clamp(s.landing + BAL.landingPerAction * (1 - s.landing), 0, 1)
+      // минимальный шаг 0.04 — иначе асимптота застревает на «99%»
+      s.landing = clamp(s.landing + Math.max(0.04, BAL.landingPerAction * (1 - s.landing)), 0, 1)
       break
     case 'post': {
       const ch = (p as ChannelId) || 'social'

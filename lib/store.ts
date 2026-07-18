@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { GameState, Lang } from './engine/types'
-import { applyAction, endDay, fastForward, newRun, resolveEvent } from './engine/engine'
+import { applyAction, endDay, newRun, resolveEvent } from './engine/engine'
 import { NICHES } from './engine/content/niches'
 
 type Screen = 'title' | 'build' | 'idea' | 'game'
@@ -22,7 +22,6 @@ interface Store {
   continueRun: () => void
   act: (id: string, p?: string | number) => void
   finishDay: () => void
-  ff: () => void
   resolveEv: (idx: number) => void
 }
 
@@ -72,10 +71,6 @@ export const useStore = create<Store>()(
       finishDay: () => {
         const g = get().game
         if (g) set({ game: endDay(g) })
-      },
-      ff: () => {
-        const g = get().game
-        if (g) set({ game: fastForward(g) })
       },
       resolveEv: (idx) => {
         const g = get().game

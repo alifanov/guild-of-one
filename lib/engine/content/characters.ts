@@ -17,6 +17,7 @@ export const PALETTE: Record<string, string> = {
   n: '#8b5a2b',
   l: '#b0b8c4',
   m: '#6b7280',
+  o: '#d97b29',
 }
 
 export const CHARACTERS: CharacterDef[] = [
@@ -203,3 +204,63 @@ export const CHARACTERS: CharacterDef[] = [
 ]
 
 export const charById = (id: string) => CHARACTERS.find((c) => c.id === id)
+
+// пиксель-портреты билдов основателя
+export const FOUNDERS: Record<string, string[]> = {
+  coder: [
+    '...bbbbbb...',
+    '..bbbbbbbb..',
+    '.bbssssssbb.',
+    '.bskksskksb.',
+    '.bssssssssb.',
+    '.bssskksssb.',
+    '..bssssssb..',
+    '..bbbbbbbb..',
+    '.bbbbbbbbbb.',
+    '.bbkkkkkkbb.',
+    '..bb....bb..',
+    '............',
+  ],
+  marketer: [
+    '...oooooo...',
+    '..oooooooo..',
+    '..ssssssss..',
+    '..skssssks..',
+    '..ssssssss..',
+    '..sskkksss..',
+    '..rrrrrrrr..',
+    '.rrrrrrrrrr.',
+    '.rryyyyyyrr.',
+    '..rr....rr..',
+    '............',
+    '............',
+  ],
+  generalist: [
+    '...nnnnnn...',
+    '..nnnnnnnn..',
+    '..ssssssss..',
+    '..skssssks..',
+    '..ssssssss..',
+    '..ssskksss..',
+    '..gggggggg..',
+    '.gggggggggg.',
+    '.ggnnnnnngg.',
+    '..gg....gg..',
+    '............',
+    '............',
+  ],
+  excorp: [
+    '...mmmmmm...',
+    '..mmmmmmmm..',
+    '..ssssssss..',
+    '..skssssks..',
+    '..ssssssss..',
+    '..ssskksss..',
+    '..kkkwwkkk..',
+    '.kkwwrrwwkk.',
+    '.kkwwrrwwkk.',
+    '..kk....kk..',
+    '............',
+    '............',
+  ],
+}

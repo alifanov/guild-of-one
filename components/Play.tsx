@@ -9,7 +9,7 @@ import { ACTIONS } from '@/lib/engine/content/actions'
 import { HIRES, hireById } from '@/lib/engine/content/hires'
 import { nicheById } from '@/lib/engine/content/niches'
 import { EVENTS } from '@/lib/engine/content/events'
-import { charById } from '@/lib/engine/content/characters'
+import { charById, FOUNDERS } from '@/lib/engine/content/characters'
 import { Bar, Panel, PixelSprite, Sparkline } from './ui'
 
 const CHANNEL_IDS: ChannelId[] = ['seo', 'social', 'forum']
@@ -60,8 +60,11 @@ function Header({ g, lang }: { g: GameState; lang: Lang }) {
   const stage = stageOf(g)
   return (
     <div className="panel p-2 sm:p-3 sticky top-2 z-10 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-      <span className="pixel-font text-[10px] text-[var(--accent)]">
-        {t(lang, 'day')} {g.day} · {t(lang, stage)}
+      <span className="flex items-center gap-2">
+        {FOUNDERS[g.buildId] && <PixelSprite sprite={FOUNDERS[g.buildId]} size={3} />}
+        <span className="pixel-font text-[10px] text-[var(--accent)]">
+          {t(lang, 'day')} {g.day} · {t(lang, stage)}
+        </span>
       </span>
       <span title={t(lang, 'money')}>💰 ${Math.floor(g.money).toLocaleString()}</span>
       <span title={t(lang, 'energy')}>⚡ {g.energy}/{g.energyMax}</span>
@@ -213,7 +216,7 @@ function ProductPanel({ g, lang }: { g: GameState; lang: Lang }) {
 }
 
 function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: string }) {
-  const { act, finishDay, ff } = useStore()
+  const { act, finishDay } = useStore()
   const [expand, setExpand] = useState<string | null>(null)
   const [price, setPrice] = useState(g.price)
   const visible = ACTIONS.filter((a) => (a.id === 'hire' ? stage === 'traction' : true))
@@ -308,21 +311,13 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
           )
         })}
       </div>
-      <div className="flex gap-2 mt-3">
+      <div className="mt-3">
         <button
-          className="pbtn pbtn-accent grow px-3 py-2 pixel-font text-[10px]"
+          className="pbtn pbtn-accent w-full px-3 py-2 pixel-font text-[10px]"
           onClick={finishDay}
           disabled={!!g.pendingEvent}
         >
           {t(lang, 'endDay')} ▶
-        </button>
-        <button
-          className="pbtn px-3 py-2 pixel-font text-[10px]"
-          onClick={ff}
-          disabled={!!g.pendingEvent}
-          title={lang === 'ru' ? 'Прогнать неделю с теми же действиями' : 'Run a week with the same actions'}
-        >
-          {t(lang, 'ff7')}
         </button>
       </div>
     </Panel>

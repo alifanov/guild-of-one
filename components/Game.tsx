@@ -4,7 +4,8 @@ import { useStore } from '@/lib/store'
 import { t, tl } from '@/lib/i18n'
 import { BUILDS } from '@/lib/engine/content/builds'
 import { nicheById } from '@/lib/engine/content/niches'
-import { Panel } from './ui'
+import { CHARACTERS, FOUNDERS } from '@/lib/engine/content/characters'
+import { Panel, PixelSprite } from './ui'
 import Play from './Play'
 
 export default function Game() {
@@ -41,6 +42,13 @@ function Title() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-4">
       <div className="text-center">
+        <div className="flex justify-center gap-3 mb-4">
+          {CHARACTERS.filter((c) =>
+            ['goblin_hater', 'dragon_investor', 'churn_demon', 'paladin_fan', 'gnome_devops'].includes(c.id)
+          ).map((c) => (
+            <PixelSprite key={c.id} sprite={c.sprite} size={4} />
+          ))}
+        </div>
         <h1 className="pixel-font text-2xl sm:text-4xl text-[var(--accent)] leading-relaxed">
           GUILD OF ONE
         </h1>
@@ -79,7 +87,7 @@ function BuildPick() {
             onClick={() => chooseBuild(b.id)}
           >
             <div className="flex items-center gap-3">
-              <span className="text-3xl">{b.icon}</span>
+              {FOUNDERS[b.id] ? <PixelSprite sprite={FOUNDERS[b.id]} size={5} /> : <span className="text-3xl">{b.icon}</span>}
               <span className="pixel-font text-xs text-[var(--accent)]">{tl(lang, b.name)}</span>
             </div>
             <div className="text-sm text-[var(--muted)]">{tl(lang, b.desc)}</div>

@@ -247,19 +247,21 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
           const check = canDoAction(g, a.id)
           const cost = a.id === 'rest' ? g.energy : energyCost(g, a.id)
           const needsExpand = a.id === 'post' || a.id === 'set_price' || a.id === 'hire'
+          // MVP готов — «Пилить MVP» превращается в полировку качества
+          const polish = a.id === 'build_mvp' && g.progress >= 100
           return (
             <div key={a.id}>
               <button
                 className="pbtn w-full px-2 py-1.5 text-left text-sm flex items-center gap-2"
                 disabled={!check.ok}
-                title={check.reason ? tl(lang, check.reason) : tl(lang, a.desc)}
+                title={check.reason ? tl(lang, check.reason) : polish ? t(lang, 'polishDesc') : tl(lang, a.desc)}
                 onClick={() => {
                   if (needsExpand) setExpand(expand === a.id ? null : a.id)
                   else act(a.id)
                 }}
               >
-                <span>{a.icon}</span>
-                <span className="grow">{tl(lang, a.name)}</span>
+                <span>{polish ? '🧹' : a.icon}</span>
+                <span className="grow">{polish ? t(lang, 'polishName') : tl(lang, a.name)}</span>
                 <span className="font-mono text-xs text-[var(--muted)] shrink-0">
                   {a.id === 'rest' ? '⚡all' : `${cost}⚡`}
                   {a.money ? ` $${a.money}` : ''}

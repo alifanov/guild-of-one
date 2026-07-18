@@ -150,7 +150,7 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
     case 'ads':
       if (s.progress < 100) return { ok: false, hide: true, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first', es: 'Primero termina el MVP', zh: '先把 MVP 做完', pt: 'Termine o MVP primeiro' } }
       if (actionId === 'post' && (p === 'email' || p === 'partners') && stageOf(s) !== 'traction')
-        return { ok: false, hide: true, reason: { ru: 'Канал открывается на Тракшне', en: 'Channel unlocks at Traction' } }
+        return { ok: false, hide: true, reason: { ru: 'Канал открывается на Тракшне', en: 'Channel unlocks at Traction', es: 'El canal se desbloquea en Tracción', zh: '该渠道在增长阶段解锁', pt: 'O canal desbloqueia na Tração' } }
       break
     case 'landing':
       if (s.landing >= 1) return { ok: false, hide: true, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect', es: 'La landing ya es perfecta', zh: '落地页已经完美了', pt: 'A landing já está perfeita' } }
@@ -168,14 +168,14 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
       if (s.stats.totalSignups <= 0) return { ok: false, hide: true, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users', es: 'No hay con quién hablar: no hay usuarios', zh: '没人可聊：还没有用户', pt: 'Ninguém para conversar: sem usuários' } }
       break
     case 'enterprise':
-      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Киты приплывают со стадии Тракшн ($1k MRR)', en: 'Whales arrive at Traction stage ($1k MRR)' } }
+      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Киты приплывают со стадии Тракшн ($1k MRR)', en: 'Whales arrive at Traction stage ($1k MRR)', es: 'Las ballenas llegan en la etapa Tracción ($1k MRR)', zh: '鲸鱼要到增长阶段才会游来（$1k MRR）', pt: 'As baleias chegam na fase Tração ($1k MRR)' } }
       break
     case 'annual':
-      if (stageOf(s) !== 'traction' || !s.payments) return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage' } }
+      if (stageOf(s) !== 'traction' || !s.payments) return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage', es: 'Se desbloquea en la etapa Tracción', zh: '增长阶段解锁', pt: 'Desbloqueado na fase Tração' } }
       break
     case 'pro':
-      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage' } }
-      if (s.features < BAL.proMinFeatures) return { ok: false, hide: true, reason: { ru: 'Нужно минимум 3 фичи', en: 'Needs at least 3 features' } }
+      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage', es: 'Se desbloquea en la etapa Tracción', zh: '增长阶段解锁', pt: 'Desbloqueado na fase Tração' } }
+      if (s.features < BAL.proMinFeatures) return { ok: false, hide: true, reason: { ru: 'Нужно минимум 3 фичи', en: 'Needs at least 3 features', es: 'Necesita al menos 3 features', zh: '至少需要 3 个功能', pt: 'Precisa de pelo menos 3 features' } }
       break
     case 'hire': {
       if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)', es: 'Se desbloquea en la etapa Tracción ($1k MRR)', zh: '增长阶段解锁（$1k MRR）', pt: 'Desbloqueado na fase Tração ($1k MRR)' } }
@@ -313,25 +313,25 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       if (!s.deal) {
         const dealMrr = Math.round(BAL.deal.minMRR + rand(s) * BAL.deal.spanMRR)
         s.deal = { mrr: dealMrr, stage: 1 }
-        log(s, { ru: `🐋 Кит на горизонте: контракт на $${dealMrr}/мес. Следующий шаг — демо`, en: `🐋 A whale on the horizon: a $${dealMrr}/mo contract. Next step — the demo` }, 'good')
+        log(s, { ru: `🐋 Кит на горизонте: контракт на $${dealMrr}/мес. Следующий шаг — демо`, en: `🐋 A whale on the horizon: a $${dealMrr}/mo contract. Next step — the demo`, es: `🐋 Una ballena en el horizonte: un contrato de $${dealMrr}/mes. Siguiente paso — la demo`, zh: `🐋 海平线上出现鲸鱼：$${dealMrr}/月的合同。下一步——演示`, pt: `🐋 Uma baleia no horizonte: um contrato de $${dealMrr}/mês. Próximo passo — a demo` }, 'good')
       } else {
         const failP = BAL.deal.failProb[s.deal.stage]
         if (rand(s) < failP) {
-          log(s, { ru: `Кит сорвался: «мы выбрали другое решение». −$${s.deal.mrr}/мес мечты`, en: `The whale got away: "we went with another solution". −$${s.deal.mrr}/mo of dreams` }, 'bad')
+          log(s, { ru: `Кит сорвался: «мы выбрали другое решение». −$${s.deal.mrr}/мес мечты`, en: `The whale got away: "we went with another solution". −$${s.deal.mrr}/mo of dreams`, es: `La ballena se escapó: «elegimos otra solución». −$${s.deal.mrr}/mes de sueños`, zh: `鲸鱼跑了："我们选了别的方案。"梦想 −$${s.deal.mrr}/月`, pt: `A baleia escapou: "escolhemos outra solução". −$${s.deal.mrr}/mês de sonhos` }, 'bad')
           s.deal = null
           s.motivation = clamp(s.motivation - 5, 0, 100)
         } else if (s.deal.stage < 3) {
           s.deal = { ...s.deal, stage: (s.deal.stage + 1) as 1 | 2 | 3 }
           const stepL = s.deal.stage === 2
-            ? { ru: 'Демо прошло отлично. Кит хочет пилот', en: 'The demo went great. The whale wants a pilot' }
-            : { ru: 'Пилот удался. Кит готов подписывать', en: 'The pilot succeeded. The whale is ready to sign' }
+            ? { ru: 'Демо прошло отлично. Кит хочет пилот', en: 'The demo went great. The whale wants a pilot', es: 'La demo salió genial. La ballena quiere un piloto', zh: '演示非常成功。鲸鱼想做试点', pt: 'A demo foi ótima. A baleia quer um piloto' }
+            : { ru: 'Пилот удался. Кит готов подписывать', en: 'The pilot succeeded. The whale is ready to sign', es: 'El piloto funcionó. La ballena está lista para firmar', zh: '试点成功。鲸鱼准备签约了', pt: 'O piloto deu certo. A baleia está pronta para assinar' }
           log(s, stepL, 'good')
         } else {
           const users = Math.max(1, Math.round(s.deal.mrr / (s.price * (s.proTier ? BAL.proMrrMult : 1))))
           s.paid += users
           recalcMrr(s)
           s.money += s.deal.mrr
-          log(s, { ru: `🐋 КОНТРАКТ ПОДПИСАН: +$${s.deal.mrr}/мес и сетап-фи $${s.deal.mrr}`, en: `🐋 CONTRACT SIGNED: +$${s.deal.mrr}/mo and a $${s.deal.mrr} setup fee` }, 'good')
+          log(s, { ru: `🐋 КОНТРАКТ ПОДПИСАН: +$${s.deal.mrr}/мес и сетап-фи $${s.deal.mrr}`, en: `🐋 CONTRACT SIGNED: +$${s.deal.mrr}/mo and a $${s.deal.mrr} setup fee`, es: `🐋 CONTRATO FIRMADO: +$${s.deal.mrr}/mes y un setup fee de $${s.deal.mrr}`, zh: `🐋 合同签了：+$${s.deal.mrr}/月，外加 $${s.deal.mrr} 启动费`, pt: `🐋 CONTRATO ASSINADO: +$${s.deal.mrr}/mês e um setup fee de $${s.deal.mrr}` }, 'good')
           s.motivation = clamp(s.motivation + 8, 0, 100)
           s.deal = null
         }
@@ -340,12 +340,12 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
     }
     case 'annual':
       s.annualPlans = true
-      log(s, { ru: 'Годовые планы включены: часть новых клиентов платит за 10 месяцев вперёд', en: 'Annual plans enabled: some new customers pay 10 months upfront' }, 'good')
+      log(s, { ru: 'Годовые планы включены: часть новых клиентов платит за 10 месяцев вперёд', en: 'Annual plans enabled: some new customers pay 10 months upfront', es: 'Planes anuales activados: parte de los clientes nuevos paga 10 meses por adelantado', zh: '年付计划已启用：一部分新客户会预付 10 个月', pt: 'Planos anuais ativados: parte dos clientes novos paga 10 meses adiantado' }, 'good')
       break
     case 'pro':
       s.proTier = true
       recalcMrr(s)
-      log(s, { ru: `Тир Pro запущен: ARPU ×${BAL.proMrrMult}. Pro-юзеры требовательнее (+churn)`, en: `Pro tier launched: ARPU ×${BAL.proMrrMult}. Pro users are pickier (+churn)` }, 'good')
+      log(s, { ru: `Тир Pro запущен: ARPU ×${BAL.proMrrMult}. Pro-юзеры требовательнее (+churn)`, en: `Pro tier launched: ARPU ×${BAL.proMrrMult}. Pro users are pickier (+churn)`, es: `Tier Pro lanzado: ARPU ×${BAL.proMrrMult}. Los usuarios Pro son más exigentes (+churn)`, zh: `Pro 档已上线：ARPU ×${BAL.proMrrMult}。Pro 用户更挑剔（+churn）`, pt: `Tier Pro lançado: ARPU ×${BAL.proMrrMult}. Usuários Pro são mais exigentes (+churn)` }, 'good')
       break
   }
   return s
@@ -439,11 +439,11 @@ export function funnelMetrics(s: GameState) {
 
 // квесты-майлстоуны: разовая награда за веху
 const QUESTS: { id: string; check: (s: GameState) => boolean; motivation: number; audience: number; text: L }[] = [
-  { id: 'q_100_signups', check: (s) => s.stats.totalSignups >= 100, motivation: 5, audience: 30, text: { ru: '🏅 Веха: 100 регистраций! Индихакеры пишут о тебе в тредах «кто чем занят»', en: '🏅 Milestone: 100 signups! Indie hackers mention you in "what are you building" threads' } },
-  { id: 'q_10_paid', check: (s) => s.paid >= 10, motivation: 5, audience: 50, text: { ru: '🏅 Веха: 10 платящих! Это уже не «проект», это бизнес (маленький, но гордый)', en: '🏅 Milestone: 10 paying users! Not a "project" anymore — a business (small but proud)' } },
-  { id: 'q_100_paid', check: (s) => s.paid >= 100, motivation: 10, audience: 200, text: { ru: '🏅 Веха: 100 платящих! Твой тред об этом соберёт больше лайков, чем сам продукт', en: '🏅 Milestone: 100 paying users! Your thread about it will get more likes than the product' } },
-  { id: 'q_1k_audience', check: (s) => s.audience >= 1000, motivation: 5, audience: 0, text: { ru: '🏅 Веха: 1000 подписчиков! Теперь ты «микроинфлюенсер» (мама гордится)', en: '🏅 Milestone: 1,000 followers! You are a "micro-influencer" now (mom is proud)' } },
-  { id: 'q_day_100', check: (s) => s.day >= 100, motivation: 8, audience: 0, text: { ru: '🏅 Веха: 100 дней в деле! Большинство бросает раньше. Ты — нет', en: '🏅 Milestone: 100 days in! Most people quit earlier. Not you' } },
+  { id: 'q_100_signups', check: (s) => s.stats.totalSignups >= 100, motivation: 5, audience: 30, text: { ru: '🏅 Веха: 100 регистраций! Индихакеры пишут о тебе в тредах «кто чем занят»', en: '🏅 Milestone: 100 signups! Indie hackers mention you in "what are you building" threads', es: '🏅 Hito: ¡100 registros! Los indie hackers te mencionan en los hilos de «¿qué estás construyendo?»', zh: '🏅 里程碑：100 个注册！独立开发者们在"你最近在做什么"帖子里提到了你', pt: '🏅 Marco: 100 cadastros! Indie hackers citam você nas threads de "o que você está construindo"' } },
+  { id: 'q_10_paid', check: (s) => s.paid >= 10, motivation: 5, audience: 50, text: { ru: '🏅 Веха: 10 платящих! Это уже не «проект», это бизнес (маленький, но гордый)', en: '🏅 Milestone: 10 paying users! Not a "project" anymore — a business (small but proud)', es: '🏅 Hito: ¡10 clientes de pago! Ya no es un «proyecto», es un negocio (pequeño pero orgulloso)', zh: '🏅 里程碑：10 个付费用户！这已经不是"项目"了，是生意（小，但骄傲）', pt: '🏅 Marco: 10 pagantes! Não é mais um "projeto" — é um negócio (pequeno, mas orgulhoso)' } },
+  { id: 'q_100_paid', check: (s) => s.paid >= 100, motivation: 10, audience: 200, text: { ru: '🏅 Веха: 100 платящих! Твой тред об этом соберёт больше лайков, чем сам продукт', en: '🏅 Milestone: 100 paying users! Your thread about it will get more likes than the product', es: '🏅 Hito: ¡100 clientes de pago! Tu hilo al respecto tendrá más likes que el propio producto', zh: '🏅 里程碑：100 个付费用户！你发的庆祝帖收获的赞会比产品本身还多', pt: '🏅 Marco: 100 pagantes! Sua thread sobre isso vai ter mais likes que o próprio produto' } },
+  { id: 'q_1k_audience', check: (s) => s.audience >= 1000, motivation: 5, audience: 0, text: { ru: '🏅 Веха: 1000 подписчиков! Теперь ты «микроинфлюенсер» (мама гордится)', en: '🏅 Milestone: 1,000 followers! You are a "micro-influencer" now (mom is proud)', es: '🏅 Hito: ¡1000 seguidores! Ahora eres un «microinfluencer» (mamá está orgullosa)', zh: '🏅 里程碑：1000 个粉丝！你现在是"微网红"了（妈妈很骄傲）', pt: '🏅 Marco: 1.000 seguidores! Agora você é um "microinfluenciador" (a mãe está orgulhosa)' } },
+  { id: 'q_day_100', check: (s) => s.day >= 100, motivation: 8, audience: 0, text: { ru: '🏅 Веха: 100 дней в деле! Большинство бросает раньше. Ты — нет', en: '🏅 Milestone: 100 days in! Most people quit earlier. Not you', es: '🏅 Hito: ¡100 días en esto! La mayoría abandona antes. Tú no', zh: '🏅 里程碑：坚持 100 天了！大多数人早就放弃了。你没有', pt: '🏅 Marco: 100 dias na jornada! A maioria desiste antes. Você não' } },
 ]
 
 export function endDay(state: GameState): GameState {
@@ -483,7 +483,7 @@ export function endDay(state: GameState): GameState {
     if (annualBuyers > 0) {
       const upfront = Math.round(annualBuyers * s.price * BAL.annualUpfrontMonths)
       s.money += upfront
-      log(s, { ru: `Годовой план: ${annualBuyers} клиент(а) заплатили $${upfront} вперёд`, en: `Annual plan: ${annualBuyers} customer(s) paid $${upfront} upfront` }, 'good')
+      log(s, { ru: `Годовой план: ${annualBuyers} клиент(а) заплатили $${upfront} вперёд`, en: `Annual plan: ${annualBuyers} customer(s) paid $${upfront} upfront`, es: `Plan anual: ${annualBuyers} cliente(s) pagaron $${upfront} por adelantado`, zh: `年付计划：${annualBuyers} 位客户预付了 $${upfront}`, pt: `Plano anual: ${annualBuyers} cliente(s) pagaram $${upfront} adiantado` }, 'good')
     }
   }
 

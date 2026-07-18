@@ -86,6 +86,24 @@ export const ACTIONS: ActionDef[] = [
     icon: '📊', energy: 1, kind: 'other', perDay: 1,
   },
   {
+    id: 'enterprise',
+    name: { ru: 'Охота на кита', en: 'Whale hunting', es: 'Caza de ballenas', zh: '猎鲸', pt: 'Caça à baleia' },
+    desc: { ru: 'Enterprise-сделка: найти → демо → пилот → контракт. Жирный чек, риск срыва на каждом шаге', en: 'Enterprise deal: find → demo → pilot → contract. Fat check, each step can fail', es: 'Trato enterprise: encontrar → demo → piloto → contrato. Cheque gordo, cada paso puede fallar', zh: '企业大单：找到 → 演示 → 试点 → 签约。大支票，每一步都可能黄', pt: 'Negócio enterprise: achar → demo → piloto → contrato. Cheque gordo, cada etapa pode falhar' },
+    icon: '🐋', energy: 4, kind: 'mkt', perDay: 1,
+  },
+  {
+    id: 'annual',
+    name: { ru: 'Ввести годовые планы', en: 'Introduce annual plans', es: 'Introducir planes anuales', zh: '推出年付套餐', pt: 'Introduzir planos anuais' },
+    desc: { ru: 'Часть новых клиентов платит за 10 мес вперёд — кэш сегодня', en: 'Some new customers pay 10 months upfront — cash today', es: 'Parte de los nuevos clientes paga 10 meses por adelantado — efectivo hoy', zh: '部分新客户预付 10 个月——现金立刻到账', pt: 'Parte dos novos clientes paga 10 meses adiantado — caixa hoje' },
+    icon: '📜', energy: 2, kind: 'other', once: true,
+  },
+  {
+    id: 'pro',
+    name: { ru: 'Запустить тир Pro', en: 'Launch the Pro tier', es: 'Lanzar el nivel Pro', zh: '上线 Pro 档', pt: 'Lançar o nível Pro' },
+    desc: { ru: 'ARPU ×1.25, нужно ≥3 фич. Pro-юзеры требовательнее: +churn', en: 'ARPU ×1.25, needs ≥3 features. Pro users are pickier: +churn', es: 'ARPU ×1.25, requiere ≥3 features. Los usuarios Pro son más exigentes: +churn', zh: 'ARPU ×1.25，需要 ≥3 个功能。Pro 用户更挑剔：+churn', pt: 'ARPU ×1.25, requer ≥3 features. Usuários Pro são mais exigentes: +churn' },
+    icon: '💎', energy: 3, kind: 'dev', once: true,
+  },
+  {
     id: 'rest',
     name: { ru: 'Отдых', en: 'Rest', es: 'Descansar', zh: '休息', pt: 'Descansar' },
     desc: { ru: 'Вся энергия дня → +мотивация. Иногда это лучший ход', en: 'All day energy → +motivation. Sometimes the best move', es: 'Toda la energía del día → +motivación. A veces es la mejor jugada', zh: '全天精力 → +动力。有时这是最优解', pt: 'Toda a energia do dia → +motivação. Às vezes é a melhor jogada' },

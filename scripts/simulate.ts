@@ -46,6 +46,19 @@ const smartPolicy: Policy = (s) => {
   if (s.features < 3) return tryA('add_feature')
   if (stageOf(s) === 'traction' && !s.hires.includes('support_goblin') && s.money > 3000)
     return tryA('hire', 'support_goblin')
+  // поздние механики
+  if (stageOf(s) === 'traction') {
+    if (!s.annualPlans) {
+      const an = tryA('annual')
+      if (an) return an
+    }
+    if (!s.proTier && s.features >= 3) {
+      const pro = tryA('pro')
+      if (pro) return pro
+    }
+    const whale = tryA('enterprise')
+    if (whale) return whale
+  }
   if (canDoAction(s, 'talk_users').ok) return { id: 'talk_users' }
   if (s.money > 6000 && s.landing > 0.6) {
     const ads = tryA('ads')

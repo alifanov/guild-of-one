@@ -16,6 +16,21 @@ export function stageOf(s: GameState): Stage {
   return s.mrr >= BAL.tractionMRR ? 'traction' : 'garage'
 }
 
+// миграция сейвов, созданных до поздних механик
+function ensure(s: GameState) {
+  s.channels.email ??= 0
+  s.channels.partners ??= 0
+  s.deal ??= null
+  s.proTier ??= false
+  s.annualPlans ??= false
+  s.questsDone ??= []
+  s.insights ??= []
+}
+
+function recalcMrr(s: GameState) {
+  s.mrr = Math.round(s.paid * s.price * (s.proTier ? BAL.proMrrMult : 1))
+}
+
 export function pmfOf(s: GameState): number {
   const n = nicheById(s.nicheId)
   const base = n.demand * (1 - n.competition * 0.4)
@@ -78,12 +93,16 @@ export function newRun(seed: number, buildId: string, nicheId: string): GameStat
     insight: 0,
     insights: [],
     analytics: false,
+    deal: null,
+    proTier: false,
+    annualPlans: false,
+    questsDone: [],
     paid: 0,
     paidFrac: 0,
     churnFrac: 0,
     mrr: 0,
     investorShare: 0,
-    channels: { seo: 0, social: 0, forum: 0 },
+    channels: { seo: 0, social: 0, forum: 0, email: 0, partners: 0 },
     postsToday: {},
     adsSpendToday: 0,
     supportToday: false,
@@ -130,6 +149,8 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
     case 'post':
     case 'ads':
       if (s.progress < 100) return { ok: false, hide: true, reason: { ru: 'Сначала допили MVP', en: 'Finish the MVP first', es: 'Primero termina el MVP', zh: '先把 MVP 做完', pt: 'Termine o MVP primeiro' } }
+      if (actionId === 'post' && (p === 'email' || p === 'partners') && stageOf(s) !== 'traction')
+        return { ok: false, hide: true, reason: { ru: 'Канал открывается на Тракшне', en: 'Channel unlocks at Traction' } }
       break
     case 'landing':
       if (s.landing >= 1) return { ok: false, hide: true, reason: { ru: 'Лендинг уже идеален', en: 'The landing is already perfect', es: 'La landing ya es perfecta', zh: '落地页已经完美了', pt: 'A landing já está perfeita' } }
@@ -145,6 +166,16 @@ export function canDoAction(s: GameState, actionId: string, p?: string | number)
       break
     case 'talk_users':
       if (s.stats.totalSignups <= 0) return { ok: false, hide: true, reason: { ru: 'Не с кем: юзеров нет', en: 'Nobody to talk to: no users', es: 'No hay con quién hablar: no hay usuarios', zh: '没人可聊：还没有用户', pt: 'Ninguém para conversar: sem usuários' } }
+      break
+    case 'enterprise':
+      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Киты приплывают со стадии Тракшн ($1k MRR)', en: 'Whales arrive at Traction stage ($1k MRR)' } }
+      break
+    case 'annual':
+      if (stageOf(s) !== 'traction' || !s.payments) return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage' } }
+      break
+    case 'pro':
+      if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн', en: 'Unlocked at Traction stage' } }
+      if (s.features < BAL.proMinFeatures) return { ok: false, hide: true, reason: { ru: 'Нужно минимум 3 фичи', en: 'Needs at least 3 features' } }
       break
     case 'hire': {
       if (stageOf(s) !== 'traction') return { ok: false, hide: true, reason: { ru: 'Доступно со стадии Тракшн ($1k MRR)', en: 'Unlocked at Traction stage ($1k MRR)', es: 'Se desbloquea en la etapa Tracción ($1k MRR)', zh: '增长阶段解锁（$1k MRR）', pt: 'Desbloqueado na fase Tração ($1k MRR)' } }
@@ -168,6 +199,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
   const check = canDoAction(state, actionId, p)
   if (!check.ok) return state
   const s = structuredClone(state)
+  ensure(s)
   const n = nicheById(s.nicheId)
   const cost = actionId === 'rest' ? s.energy : energyCost(s, actionId)
   const a = actionById(actionId)
@@ -251,7 +283,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
     case 'set_price': {
       const newPrice = Math.max(1, Math.round(Number(p) || s.price))
       s.price = newPrice
-      s.mrr = s.paid * s.price
+      recalcMrr(s)
       log(s, { ru: `Новая цена: $${newPrice}/мес`, en: `New price: $${newPrice}/mo`, es: `Nuevo precio: $${newPrice}/mes`, zh: `新价格：$${newPrice}/月`, pt: `Novo preço: $${newPrice}/mês` })
       break
     }
@@ -277,12 +309,51 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       log(s, { ru: `${h.name.ru} в команде (+$${h.monthly}/мес)`, en: `${h.name.en} joined (+$${h.monthly}/mo)`, es: `${h.name.es ?? h.name.en} se unió al equipo (+$${h.monthly}/mes)`, zh: `${h.name.zh ?? h.name.en} 加入了团队（+$${h.monthly}/月）`, pt: `${h.name.pt ?? h.name.en} entrou no time (+$${h.monthly}/mês)` }, 'good')
       break
     }
+    case 'enterprise': {
+      if (!s.deal) {
+        const dealMrr = Math.round(BAL.deal.minMRR + rand(s) * BAL.deal.spanMRR)
+        s.deal = { mrr: dealMrr, stage: 1 }
+        log(s, { ru: `🐋 Кит на горизонте: контракт на $${dealMrr}/мес. Следующий шаг — демо`, en: `🐋 A whale on the horizon: a $${dealMrr}/mo contract. Next step — the demo` }, 'good')
+      } else {
+        const failP = BAL.deal.failProb[s.deal.stage]
+        if (rand(s) < failP) {
+          log(s, { ru: `Кит сорвался: «мы выбрали другое решение». −$${s.deal.mrr}/мес мечты`, en: `The whale got away: "we went with another solution". −$${s.deal.mrr}/mo of dreams` }, 'bad')
+          s.deal = null
+          s.motivation = clamp(s.motivation - 5, 0, 100)
+        } else if (s.deal.stage < 3) {
+          s.deal = { ...s.deal, stage: (s.deal.stage + 1) as 1 | 2 | 3 }
+          const stepL = s.deal.stage === 2
+            ? { ru: 'Демо прошло отлично. Кит хочет пилот', en: 'The demo went great. The whale wants a pilot' }
+            : { ru: 'Пилот удался. Кит готов подписывать', en: 'The pilot succeeded. The whale is ready to sign' }
+          log(s, stepL, 'good')
+        } else {
+          const users = Math.max(1, Math.round(s.deal.mrr / (s.price * (s.proTier ? BAL.proMrrMult : 1))))
+          s.paid += users
+          recalcMrr(s)
+          s.money += s.deal.mrr
+          log(s, { ru: `🐋 КОНТРАКТ ПОДПИСАН: +$${s.deal.mrr}/мес и сетап-фи $${s.deal.mrr}`, en: `🐋 CONTRACT SIGNED: +$${s.deal.mrr}/mo and a $${s.deal.mrr} setup fee` }, 'good')
+          s.motivation = clamp(s.motivation + 8, 0, 100)
+          s.deal = null
+        }
+      }
+      break
+    }
+    case 'annual':
+      s.annualPlans = true
+      log(s, { ru: 'Годовые планы включены: часть новых клиентов платит за 10 месяцев вперёд', en: 'Annual plans enabled: some new customers pay 10 months upfront' }, 'good')
+      break
+    case 'pro':
+      s.proTier = true
+      recalcMrr(s)
+      log(s, { ru: `Тир Pro запущен: ARPU ×${BAL.proMrrMult}. Pro-юзеры требовательнее (+churn)`, en: `Pro tier launched: ARPU ×${BAL.proMrrMult}. Pro users are pickier (+churn)` }, 'good')
+      break
   }
   return s
 }
 
 export function applyEffects(state: GameState, fx: Effects, eventId?: string): GameState {
   const s = structuredClone(state)
+  ensure(s)
   const b = buildById(s.buildId)
   if (fx.money) {
     s.money += fx.money
@@ -299,18 +370,19 @@ export function applyEffects(state: GameState, fx: Effects, eventId?: string): G
   if (fx.pmfBonus) s.insight = clamp(s.insight + fx.pmfBonus, 0, BAL.insightCap + 0.1)
   if (fx.paid) {
     s.paid = Math.max(0, s.paid + fx.paid)
-    s.mrr = s.paid * s.price
+    recalcMrr(s)
   }
   if (fx.churnPct) {
     const lost = Math.ceil(s.paid * fx.churnPct)
     s.paid = Math.max(0, s.paid - lost)
-    s.mrr = s.paid * s.price
+    recalcMrr(s)
   }
   if (fx.traffic) s.mods.push({ kind: 'traffic', value: fx.traffic.mult, days: fx.traffic.days })
   if (fx.demand) s.mods.push({ kind: 'demand', value: fx.demand.mult, days: fx.demand.days })
   if (fx.sick) s.mods.push({ kind: 'energy', value: fx.sick.energy, days: fx.sick.days })
   if (fx.infra) s.infraMonthly = Math.max(10, s.infraMonthly + fx.infra)
   if (fx.share) s.investorShare = clamp(s.investorShare + fx.share, 0, 0.9)
+  if (fx.end === 'sold') s.money += s.mrr * BAL.exitMultipleMonths // экзит: 3× годовой выручки
   if (fx.end) s.status = fx.end
   return s
 }
@@ -349,11 +421,11 @@ export function funnelMetrics(s: GameState) {
   const pmf = pmfOf(s)
   const demandMult = modMult(s, 'demand')
   const trafficMult = modMult(s, 'traffic')
-  const active = (Object.keys(s.channels) as ChannelId[]).filter((c) => s.channels[c] > BAL.activeChannelThreshold)
-  const chPenalty = active.length >= 2 ? BAL.multiChannelPenalty : 1
+  const active = (Object.keys(s.channels) as ChannelId[]).filter((c) => (s.channels[c] ?? 0) > BAL.activeChannelThreshold)
+  const chPenalty = BAL.multiChannelPenalty(active.length)
   const fit = fitFor(s.nicheId)
   let organic = 0
-  for (const c of active) organic += BAL.channels[c].visits(s.channels[c], s.audience) * chPenalty * fit[c]
+  for (const c of active) organic += BAL.channels[c].visits(s.channels[c], s.audience) * chPenalty * (fit[c] ?? 1)
   const cpv = BAL.adsCpv(n.competition, s.landing)
   const adsVisits = s.adsSpendToday / cpv
   const spike = s.launchToday ? BAL.launchSpike(s.audience, s.landing, s.validated, s.launches) : 0
@@ -361,13 +433,23 @@ export function funnelMetrics(s: GameState) {
   const priceFactor = BAL.priceFactor(s.price, n.arpuCap)
   const convPay = BAL.convPay(s.quality, pmf, priceFactor) * Math.min(1.5, demandMult)
   const support = s.supportToday || s.hires.includes('support_goblin')
-  const churnMonthly = BAL.churnMonthly(s.quality, s.bugs, support)
+  const churnMonthly = BAL.churnMonthly(s.quality, s.bugs, support) + (s.proTier ? BAL.proChurnAdd : 0)
   return { pmf, organic, adsVisits, spike, convLp, convPay, churnMonthly, cpv, trafficMult, demandMult }
 }
+
+// квесты-майлстоуны: разовая награда за веху
+const QUESTS: { id: string; check: (s: GameState) => boolean; motivation: number; audience: number; text: L }[] = [
+  { id: 'q_100_signups', check: (s) => s.stats.totalSignups >= 100, motivation: 5, audience: 30, text: { ru: '🏅 Веха: 100 регистраций! Индихакеры пишут о тебе в тредах «кто чем занят»', en: '🏅 Milestone: 100 signups! Indie hackers mention you in "what are you building" threads' } },
+  { id: 'q_10_paid', check: (s) => s.paid >= 10, motivation: 5, audience: 50, text: { ru: '🏅 Веха: 10 платящих! Это уже не «проект», это бизнес (маленький, но гордый)', en: '🏅 Milestone: 10 paying users! Not a "project" anymore — a business (small but proud)' } },
+  { id: 'q_100_paid', check: (s) => s.paid >= 100, motivation: 10, audience: 200, text: { ru: '🏅 Веха: 100 платящих! Твой тред об этом соберёт больше лайков, чем сам продукт', en: '🏅 Milestone: 100 paying users! Your thread about it will get more likes than the product' } },
+  { id: 'q_1k_audience', check: (s) => s.audience >= 1000, motivation: 5, audience: 0, text: { ru: '🏅 Веха: 1000 подписчиков! Теперь ты «микроинфлюенсер» (мама гордится)', en: '🏅 Milestone: 1,000 followers! You are a "micro-influencer" now (mom is proud)' } },
+  { id: 'q_day_100', check: (s) => s.day >= 100, motivation: 8, audience: 0, text: { ru: '🏅 Веха: 100 дней в деле! Большинство бросает раньше. Ты — нет', en: '🏅 Milestone: 100 days in! Most people quit earlier. Not you' } },
+]
 
 export function endDay(state: GameState): GameState {
   if (state.status !== 'playing' || state.pendingEvent) return state
   const s = structuredClone(state)
+  ensure(s)
   const n = nicheById(s.nicheId)
   const b = buildById(s.buildId)
 
@@ -393,7 +475,17 @@ export function endDay(state: GameState): GameState {
   s.churnFrac -= churned
 
   s.paid = s.paid + newPaid - churned
-  s.mrr = s.paid * s.price
+  recalcMrr(s)
+
+  // годовые планы: часть новых платит вперёд
+  if (s.annualPlans && newPaid > 0) {
+    const annualBuyers = Math.round(newPaid * BAL.annualShare)
+    if (annualBuyers > 0) {
+      const upfront = Math.round(annualBuyers * s.price * BAL.annualUpfrontMonths)
+      s.money += upfront
+      log(s, { ru: `Годовой план: ${annualBuyers} клиент(а) заплатили $${upfront} вперёд`, en: `Annual plan: ${annualBuyers} customer(s) paid $${upfront} upfront` }, 'good')
+    }
+  }
 
   // деньги: доход и burn — подневно
   const hiresMonthly = s.hires.reduce((a, h) => a + hireById(h).monthly, 0)
@@ -436,6 +528,15 @@ export function endDay(state: GameState): GameState {
       s.milestones.push(ms)
       s.motivation = clamp(s.motivation + BAL.milestoneBonus, 0, 100)
       log(s, { ru: `Веха: $${ms} MRR!`, en: `Milestone: $${ms} MRR!`, es: `¡Hito: $${ms} MRR!`, zh: `里程碑：$${ms} MRR！`, pt: `Marco: $${ms} MRR!` }, 'good')
+    }
+  }
+  // квесты-майлстоуны
+  for (const q of QUESTS) {
+    if (!s.questsDone.includes(q.id) && q.check(s)) {
+      s.questsDone.push(q.id)
+      s.motivation = clamp(s.motivation + q.motivation, 0, 100)
+      s.audience += q.audience
+      log(s, q.text, 'good')
     }
   }
 

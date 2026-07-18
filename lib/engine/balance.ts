@@ -47,14 +47,28 @@ export const BAL = {
   churnMonthly: (quality: number, bugs: number, support: boolean) =>
     Math.min(0.4, Math.max(0.015, 0.03 + 0.2 * (1 - quality) + 0.01 * bugs - (support ? 0.05 : 0))),
 
-  // каналы: visits(momentum), decay/день
+  // каналы: visits(momentum), decay/день; email/partners — только Тракшн
   channels: {
     seo: { visits: (m: number, _aud: number) => 8 * Math.pow(m, 1.3), decay: 0.01, postMomentum: 1 },
     social: { visits: (m: number, aud: number) => m * (4 + aud * 0.04), decay: 0.3, postMomentum: 1 },
     forum: { visits: (m: number, _aud: number) => m * 14, decay: 0.15, postMomentum: 1 },
+    email: { visits: (m: number, aud: number) => m * (8 + aud * 0.05), decay: 0.12, postMomentum: 1 },
+    partners: { visits: (m: number, _aud: number) => m * 22, decay: 0.04, postMomentum: 1 },
   },
-  multiChannelPenalty: 0.4, // эффективность каждого при 2+ активных каналах
+  // штраф за распыление: 1 канал ×1, 2 канала ×0.6, 3+ ×0.4
+  multiChannelPenalty: (active: number) => (active <= 1 ? 1 : active === 2 ? 0.6 : 0.4),
   activeChannelThreshold: 0.5,
+
+  // enterprise-сделки («киты»): шанс срыва по стадиям демо/пилот/контракт
+  deal: { minMRR: 300, spanMRR: 1200, failProb: [0, 0.2, 0.25, 0.3] as const },
+
+  // поздние тарифы
+  proMrrMult: 1.25,
+  proChurnAdd: 0.01,
+  proMinFeatures: 3,
+  annualShare: 0.25, // доля новых платящих, берущих годовой план
+  annualUpfrontMonths: 10, // платят 10 месяцев вперёд (2 мес — дисконт)
+  exitMultipleMonths: 36, // экзит = 3 годовые выручки
 
   // реклама: $ за визит
   adsCpv: (competition: number, landing: number) => (0.8 + competition * 4) * (1.2 - 0.5 * landing),

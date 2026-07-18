@@ -122,4 +122,16 @@ export const CHANNEL_FIT: Record<string, { seo: number; social: number; forum: n
   tarot_api: { seo: 0.8, social: 1.1, forum: 1.3 },
 }
 
-export const fitFor = (nicheId: string) => CHANNEL_FIT[nicheId] ?? { seo: 1, social: 1, forum: 1 }
+// поздние каналы: у B2B-ниш партнёрка сильнее, у виральных — рассылка
+const LATE_FIT: Record<string, { email?: number; partners?: number }> = {
+  dungeon_crm: { partners: 1.4 },
+  dwarf_jobboard: { partners: 1.3 },
+  crypto_tax: { partners: 1.2 },
+  tarot_api: { partners: 1.3 },
+  cat_habits: { email: 1.3 },
+  meme_scheduler: { email: 1.2 },
+  mage_newsletter: { email: 1.4 },
+}
+
+export const fitFor = (nicheId: string): Record<string, number> =>
+  Object.assign({ seo: 1, social: 1, forum: 1, email: 1, partners: 1 }, CHANNEL_FIT[nicheId], LATE_FIT[nicheId])

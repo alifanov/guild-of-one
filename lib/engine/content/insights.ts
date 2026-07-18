@@ -1,7 +1,7 @@
 import type { ChannelId, GameState, L } from '../types'
 import { fitFor, nicheById } from './niches'
 
-const CH_NAME: Record<ChannelId, string> = { seo: 'SEO', social: 'Xitter', forum: 'Dungeon Boards' }
+const CH_NAME: Record<ChannelId, string> = { seo: 'SEO', social: 'Xitter', forum: 'Dungeon Boards', email: 'Owl Mail', partners: 'Partner Guild' }
 
 export interface InsightDef {
   id: string

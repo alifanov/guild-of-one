@@ -4,9 +4,12 @@ export type L = { ru: string; en: string } & Partial<Record<'es' | 'zh' | 'pt', 
 export const LANGS: Lang[] = ['ru', 'en', 'es', 'zh', 'pt']
 export const LANG_LABELS: Record<Lang, string> = { ru: 'RU', en: 'EN', es: 'ES', zh: '中文', pt: 'PT' }
 
-export type ChannelId = 'seo' | 'social' | 'forum'
+export type ChannelId = 'seo' | 'social' | 'forum' | 'email' | 'partners'
+// email и partners открываются на стадии Тракшн
+export const BASE_CHANNELS: ChannelId[] = ['seo', 'social', 'forum']
+export const TRACTION_CHANNELS: ChannelId[] = ['email', 'partners']
 export type Stage = 'garage' | 'traction'
-export type Status = 'playing' | 'won' | 'lost_money' | 'lost_burnout' | 'quit_job' | 'shutdown'
+export type Status = 'playing' | 'won' | 'lost_money' | 'lost_burnout' | 'quit_job' | 'shutdown' | 'sold'
 
 export interface NicheDef {
   id: string
@@ -159,6 +162,11 @@ export interface GameState {
   adsSpendToday: number
   supportToday: boolean
   restToday: boolean
+  // поздняя стадия
+  deal: { mrr: number; stage: 1 | 2 | 3 } | null // enterprise-сделка: найден → демо → пилот → контракт
+  proTier: boolean
+  annualPlans: boolean
+  questsDone: string[]
   // команда/расходы
   hires: string[]
   infraMonthly: number

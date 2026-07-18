@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useStore } from '@/lib/store'
 import { t, tl } from '@/lib/i18n'
-import type { ChannelId, GameState, Lang } from '@/lib/engine/types'
+import { BASE_CHANNELS, TRACTION_CHANNELS, type ChannelId, type GameState, type Lang } from '@/lib/engine/types'
 import { canDoAction, energyCost, funnelMetrics, stageOf } from '@/lib/engine/engine'
 import { BAL } from '@/lib/engine/balance'
 import { ACTIONS } from '@/lib/engine/content/actions'
@@ -13,7 +13,9 @@ import { insightById } from '@/lib/engine/content/insights'
 import { charById, FOUNDERS } from '@/lib/engine/content/characters'
 import { Bar, Panel, PixelSprite, Sparkline } from './ui'
 
-const CHANNEL_IDS: ChannelId[] = ['seo', 'social', 'forum']
+// email и partners появляются на Тракшне
+const channelsFor = (g: GameState): ChannelId[] =>
+  stageOf(g) === 'traction' ? [...BASE_CHANNELS, ...TRACTION_CHANNELS] : BASE_CHANNELS
 
 export default function Play() {
   const g = useStore((s) => s.game)
@@ -137,16 +139,17 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
 }
 
 function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
-  const active = CHANNEL_IDS.filter((c) => g.channels[c] > BAL.activeChannelThreshold)
+  const chans = channelsFor(g)
+  const active = chans.filter((c) => (g.channels[c] ?? 0) > BAL.activeChannelThreshold)
   return (
     <Panel title={t(lang, 'channels')} className="h-full">
       <div className="flex flex-col gap-2">
-        {CHANNEL_IDS.map((c) => (
+        {chans.map((c) => (
           <div key={c} className="flex items-center gap-2">
             <span className="text-sm w-36 shrink-0">{t(lang, c)}</span>
-            <Bar value={Math.min(g.channels[c], 20)} max={20} color="var(--good)" />
+            <Bar value={Math.min(g.channels[c] ?? 0, 20)} max={20} color="var(--good)" />
             <span className="font-mono text-xs text-[var(--muted)] w-10 text-right">
-              {g.channels[c].toFixed(1)}
+              {(g.channels[c] ?? 0).toFixed(1)}
             </span>
           </div>
         ))}
@@ -267,6 +270,11 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
           const needsExpand = a.id === 'post' || a.id === 'set_price' || a.id === 'hire'
           // MVP готов — «Пилить MVP» превращается в полировку качества
           const polish = a.id === 'build_mvp' && g.progress >= 100
+          // enterprise: лейбл по стадии сделки
+          const whaleLabel =
+            a.id === 'enterprise' && g.deal
+              ? t(lang, g.deal.stage === 1 ? 'whale_demo' : g.deal.stage === 2 ? 'whale_pilot' : 'whale_sign')
+              : null
           return (
             <div key={a.id}>
               <button
@@ -279,18 +287,18 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
                 }}
               >
                 <span>{polish ? '🧹' : a.icon}</span>
-                <span className="grow">{polish ? t(lang, 'polishName') : tl(lang, a.name)}</span>
+                <span className="grow">{whaleLabel ?? (polish ? t(lang, 'polishName') : tl(lang, a.name))}</span>
                 <span className="font-mono text-xs text-[var(--muted)] shrink-0">
                   {a.id === 'rest' ? '⚡all' : `${cost}⚡`}
                   {a.money ? ` $${a.money}` : ''}
                 </span>
               </button>
               {expand === 'post' && a.id === 'post' && (
-                <div className="flex gap-1 mt-1 pl-6">
-                  {CHANNEL_IDS.map((c) => (
+                <div className="flex gap-1 mt-1 pl-6 flex-wrap">
+                  {channelsFor(g).map((c) => (
                     <button
                       key={c}
-                      className="pbtn px-2 py-1 text-xs flex-1"
+                      className="pbtn px-2 py-1 text-xs flex-1 whitespace-nowrap"
                       onClick={() => {
                         act('post', c)
                         setExpand(null)
@@ -429,17 +437,19 @@ function EventModal({ g, lang }: { g: GameState; lang: Lang }) {
 
 function EndOverlay({ g, lang }: { g: GameState; lang: Lang }) {
   const { startNewRun, toTitle } = useStore()
-  const won = g.status === 'won'
+  const won = g.status === 'won' || g.status === 'sold'
   const verdict =
     g.status === 'won'
       ? t(lang, 'verdict_won')
-      : g.status === 'lost_money'
-        ? t(lang, 'verdict_money')
-        : g.status === 'lost_burnout'
-          ? t(lang, 'verdict_burnout')
-          : g.status === 'shutdown'
-            ? t(lang, 'verdict_shutdown')
-            : t(lang, 'verdict_quit')
+      : g.status === 'sold'
+        ? t(lang, 'verdict_sold')
+        : g.status === 'lost_money'
+          ? t(lang, 'verdict_money')
+          : g.status === 'lost_burnout'
+            ? t(lang, 'verdict_burnout')
+            : g.status === 'shutdown'
+              ? t(lang, 'verdict_shutdown')
+              : t(lang, 'verdict_quit')
   const download = () => {
     const cv = document.createElement('canvas')
     cv.width = 800
@@ -455,7 +465,7 @@ function EndOverlay({ g, lang }: { g: GameState; lang: Lang }) {
     ctx.fillText('GUILD OF ONE', 40, 70)
     ctx.fillStyle = won ? '#5cb85c' : '#e05555'
     ctx.font = 'bold 26px monospace'
-    ctx.fillText(won ? t(lang, 'won') : t(lang, 'lost'), 40, 120)
+    ctx.fillText(g.status === 'sold' ? t(lang, 'sold') : won ? t(lang, 'won') : t(lang, 'lost'), 40, 120)
     ctx.fillStyle = '#e8e4f0'
     ctx.font = '20px monospace'
     wrapText(ctx, verdict, 40, 160, 720, 26)
@@ -480,7 +490,7 @@ function EndOverlay({ g, lang }: { g: GameState; lang: Lang }) {
     <div className="fixed inset-0 bg-black/80 z-30 flex items-center justify-center p-4 overflow-y-auto">
       <div className="panel p-5 max-w-lg w-full flex flex-col gap-4">
         <h2 className={`pixel-font text-lg ${won ? 'text-[var(--good)]' : 'text-[var(--bad)]'}`}>
-          {won ? t(lang, 'won') : t(lang, 'lost')}
+          {g.status === 'sold' ? t(lang, 'sold') : won ? t(lang, 'won') : t(lang, 'lost')}
         </h2>
         <p className="text-sm">
           {verdict} <span className="text-[var(--muted)]">({t(lang, 'onDay')} {g.day})</span>

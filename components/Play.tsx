@@ -491,7 +491,7 @@ function ShareRow({ g, lang, won }: { g: GameState; lang: Lang; won: boolean }) 
   const enc = encodeURIComponent
   const nets: { id: string; icon: string; href: string }[] = [
     { id: 'x', icon: '𝕏', href: `https://twitter.com/intent/tweet?text=${enc(`${text} ${GAME_URL}`)}` },
-    { id: 'telegram', icon: '✈', href: `https://t.me/share/url?url=${enc(GAME_URL)}&text=${enc(text)}` },
+    { id: 'telegram', icon: 'TG', href: `https://t.me/share/url?url=${enc(GAME_URL)}&text=${enc(text)}` },
     { id: 'reddit', icon: '👽', href: `https://www.reddit.com/submit?url=${enc(GAME_URL)}&title=${enc(text)}` },
     { id: 'linkedin', icon: 'in', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(GAME_URL)}` },
     { id: 'facebook', icon: 'f', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(GAME_URL)}&quote=${enc(text)}` },

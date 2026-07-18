@@ -109,7 +109,10 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
   const cacPaid = m.convLp * m.convPay > 0 ? m.cpv / (m.convLp * m.convPay) : 0
   const ltv = m.churnMonthly > 0 ? g.price / m.churnMonthly : 0
   return (
-    <Panel title={t(lang, 'funnel')} className="h-full">
+    <Panel
+      title={g.day > 1 ? `${t(lang, 'funnel')} · ${t(lang, 'dayLower')} ${g.day - 1}` : t(lang, 'funnel')}
+      className="h-full"
+    >
       <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1">
         <Row k={t(lang, 'visits')} v={`${g.lastVisits}`} />
         <Row k={t(lang, 'signups')} v={`${g.lastSignups}`} sub={`(${(m.convLp * 100).toFixed(1)}%)`} />
@@ -383,8 +386,9 @@ function ActionsPanel({ g, lang, stage }: { g: GameState; lang: Lang; stage: str
 function LogPanel({ g, lang }: { g: GameState; lang: Lang }) {
   return (
     <Panel title={t(lang, 'logTitle')}>
-      <div className="flex flex-col-reverse gap-0.5 max-h-40 overflow-y-auto font-mono text-xs">
-        {g.log.slice(-25).map((e, i) => (
+      {/* новые записи сверху; col-reverse не используем — он прокручивает к старым */}
+      <div className="flex flex-col gap-0.5 max-h-40 overflow-y-auto font-mono text-xs">
+        {[...g.log.slice(-25)].reverse().map((e, i) => (
           <div
             key={i}
             className={

@@ -101,3 +101,25 @@ export const NICHES: NicheDef[] = [
 ]
 
 export const nicheById = (id: string) => NICHES.find((n) => n.id === id)!
+
+// насколько канал попадает в ЦА ниши (множитель к визитам); раскрывается инсайтами
+export const CHANNEL_FIT: Record<string, { seo: number; social: number; forum: number }> = {
+  ai_screenshots: { seo: 0.8, social: 1.4, forum: 1.0 },
+  cat_habits: { seo: 0.7, social: 1.5, forum: 0.9 },
+  dragon_walking: { seo: 0.9, social: 1.0, forum: 1.0 },
+  freelance_invoices: { seo: 1.4, social: 0.7, forum: 1.0 },
+  seo_audit: { seo: 1.5, social: 0.9, forum: 0.8 },
+  habit_tracker: { seo: 1.0, social: 1.3, forum: 0.7 },
+  dwarf_jobboard: { seo: 1.1, social: 0.6, forum: 1.4 },
+  mage_newsletter: { seo: 1.0, social: 1.2, forum: 0.8 },
+  crypto_tax: { seo: 1.4, social: 0.7, forum: 1.1 },
+  meme_scheduler: { seo: 0.6, social: 1.6, forum: 0.9 },
+  dungeon_crm: { seo: 1.2, social: 0.6, forum: 1.3 },
+  ai_cover_letters: { seo: 1.5, social: 0.8, forum: 0.7 },
+  crystal_uptime: { seo: 1.2, social: 0.7, forum: 1.2 },
+  nft_pets: { seo: 0.5, social: 1.4, forum: 0.8 },
+  voice_todo: { seo: 0.9, social: 1.2, forum: 0.8 },
+  tarot_api: { seo: 0.8, social: 1.1, forum: 1.3 },
+}
+
+export const fitFor = (nicheId: string) => CHANNEL_FIT[nicheId] ?? { seo: 1, social: 1, forum: 1 }

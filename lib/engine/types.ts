@@ -145,6 +145,7 @@ export interface GameState {
   validated: boolean
   donorResearched: boolean
   insight: number // 0..0.35 — из общения с юзерами и т.п.
+  insights: string[] // id открытых фактов-инсайтов
   analytics: boolean
   // воронка
   paid: number

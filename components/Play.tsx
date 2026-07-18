@@ -9,6 +9,7 @@ import { ACTIONS } from '@/lib/engine/content/actions'
 import { HIRES, hireById } from '@/lib/engine/content/hires'
 import { nicheById } from '@/lib/engine/content/niches'
 import { EVENTS } from '@/lib/engine/content/events'
+import { INSIGHTS, insightById } from '@/lib/engine/content/insights'
 import { charById, FOUNDERS } from '@/lib/engine/content/characters'
 import { Bar, Panel, PixelSprite, Sparkline } from './ui'
 
@@ -40,6 +41,7 @@ export default function Play() {
           <div className={`${tab === 'funnel' ? 'flex' : 'hidden'} lg:flex flex-col gap-3`}>
             <FunnelPanel g={g} lang={lang} />
             <ChannelsPanel g={g} lang={lang} />
+            <InsightsPanel g={g} lang={lang} />
           </div>
           <div className={`${tab === 'product' ? 'flex' : 'hidden'} lg:flex flex-col gap-3`}>
             <ProductPanel g={g} lang={lang} />
@@ -105,7 +107,7 @@ function FunnelPanel({ g, lang }: { g: GameState; lang: Lang }) {
         <Row k={t(lang, 'visits')} v={`${g.lastVisits}`} />
         <Row k={t(lang, 'signups')} v={`${g.lastSignups}`} sub={`(${(m.convLp * 100).toFixed(1)}%)`} />
         <Row k={t(lang, 'paying')} v={`${g.paid}`} sub={`+${g.lastNewPaid}/−${g.lastChurned}`} />
-        <Row k={t(lang, 'churn')} v={`${(m.churnMonthly * 100).toFixed(0)}%`} sub={t(lang, 'perMonth')} />
+        <Row k={t(lang, 'churn')} v={g.paid > 0 ? `${(m.churnMonthly * 100).toFixed(0)}%` : '—'} sub={g.paid > 0 ? t(lang, 'perMonth') : ''} />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <div>
@@ -164,6 +166,25 @@ function ChannelsPanel({ g, lang }: { g: GameState; lang: Lang }) {
               )
             })}
           </div>
+        </div>
+      )}
+    </Panel>
+  )
+}
+
+function InsightsPanel({ g, lang }: { g: GameState; lang: Lang }) {
+  const unlocked = (g.insights ?? []).map((id) => insightById(id)).filter(Boolean)
+  return (
+    <Panel title={`💡 ${t(lang, 'insightsTitle')} (${unlocked.length}/${INSIGHTS.length})`}>
+      {unlocked.length === 0 ? (
+        <div className="text-xs text-[var(--muted)]">{t(lang, 'insightsHint')}</div>
+      ) : (
+        <div className="flex flex-col gap-1 text-sm">
+          {unlocked.map((ins) => (
+            <div key={ins!.id} className="text-[var(--good)]">
+              {tl(lang, ins!.text(g))}
+            </div>
+          ))}
         </div>
       )}
     </Panel>

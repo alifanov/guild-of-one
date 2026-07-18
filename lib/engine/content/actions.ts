@@ -83,7 +83,7 @@ export const ACTIONS: ActionDef[] = [
     id: 'metrics',
     name: { ru: 'Смотреть метрики', en: 'Check metrics', es: 'Ver métricas', zh: '看数据指标', pt: 'Ver métricas' },
     desc: { ru: 'Открывает детальную аналитику (CAC/LTV/churn)', en: 'Unlocks detailed analytics (CAC/LTV/churn)', es: 'Desbloquea analítica detallada (CAC/LTV/churn)', zh: '解锁详细分析 (CAC/LTV/churn)', pt: 'Desbloqueia análises detalhadas (CAC/LTV/churn)' },
-    icon: '📊', energy: 1, kind: 'other', once: true,
+    icon: '📊', energy: 1, kind: 'other', perDay: 1,
   },
   {
     id: 'rest',

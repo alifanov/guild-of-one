@@ -7,6 +7,8 @@ import { actionById } from './content/actions'
 import { hireById, HIRES } from './content/hires'
 import { EVENTS } from './content/events'
 import { FLAVOR } from './content/flavor'
+import { INSIGHTS } from './content/insights'
+import { fitFor } from './content/niches'
 
 export const SAVE_VERSION = 1
 
@@ -28,6 +30,16 @@ const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v
 
 function modMult(s: GameState, kind: 'traffic' | 'demand'): number {
   return s.mods.filter((m) => m.kind === kind).reduce((a, m) => a * m.value, 1)
+}
+
+// выдаёт первый ещё не открытый актуальный инсайт (общение с юзерами / метрики)
+function unlockInsight(s: GameState) {
+  if (!s.insights) s.insights = [] // сейвы до появления инсайтов
+  const next = INSIGHTS.find((i) => !s.insights.includes(i.id) && i.when(s))
+  if (next) {
+    s.insights.push(next.id)
+    log(s, next.text(s), 'good')
+  }
 }
 
 function log(s: GameState, text: L, tone: 'good' | 'bad' | 'info' = 'info') {
@@ -64,6 +76,7 @@ export function newRun(seed: number, buildId: string, nicheId: string): GameStat
     validated: false,
     donorResearched: false,
     insight: 0,
+    insights: [],
     analytics: false,
     paid: 0,
     paidFrac: 0,
@@ -230,6 +243,7 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       log(s, happy
         ? { ru: 'Юзеры в целом довольны. Записал пару инсайтов.', en: 'Users are mostly happy. Wrote down a couple of insights.', es: 'Los usuarios están contentos en general. Anotaste un par de insights.', zh: '用户总体还算满意。记下了几条洞察。', pt: 'Os usuários estão satisfeitos no geral. Anotou alguns insights.' }
         : { ru: 'Юзеры жалуются на качество. Больно, но полезно.', en: 'Users complain about quality. Painful but useful.', es: 'Los usuarios se quejan de la calidad. Duele, pero sirve.', zh: '用户在抱怨质量。很痛，但有用。', pt: 'Os usuários reclamam da qualidade. Dói, mas é útil.' }, happy ? 'good' : 'bad')
+      unlockInsight(s)
       break
     }
     case 'set_price': {
@@ -244,8 +258,11 @@ export function applyAction(state: GameState, actionId: string, p?: string | num
       log(s, { ru: 'Gold Golem Pay подключён. Голем берёт 2.9% + жертвоприношение.', en: 'Gold Golem Pay connected. The golem takes 2.9% + a small sacrifice.', es: 'Gold Golem Pay conectado. El gólem cobra 2.9% + un pequeño sacrificio.', zh: 'Gold Golem Pay 已接入。石魔收取 2.9% 外加一点祭品。', pt: 'Gold Golem Pay conectado. O golem cobra 2.9% + um pequeno sacrifício.' }, 'good')
       break
     case 'metrics':
-      s.analytics = true
-      log(s, { ru: 'Аналитика открыта: CAC, LTV, churn — теперь на дашборде.', en: 'Analytics unlocked: CAC, LTV, churn — now on the dashboard.', es: 'Analítica desbloqueada: CAC, LTV, churn — ahora en el dashboard.', zh: '数据分析已解锁：CAC、LTV、churn 都上仪表盘了。', pt: 'Analytics desbloqueado: CAC, LTV, churn — agora no dashboard.' }, 'good')
+      if (!s.analytics) {
+        s.analytics = true
+        log(s, { ru: 'Аналитика открыта: CAC, LTV, churn — теперь на дашборде.', en: 'Analytics unlocked: CAC, LTV, churn — now on the dashboard.', es: 'Analítica desbloqueada: CAC, LTV, churn — ahora en el dashboard.', zh: '数据分析已解锁：CAC、LTV、churn 都上仪表盘了。', pt: 'Analytics desbloqueado: CAC, LTV, churn — agora no dashboard.' }, 'good')
+      }
+      unlockInsight(s)
       break
     case 'rest':
       s.restToday = true
@@ -332,8 +349,9 @@ export function funnelMetrics(s: GameState) {
   const trafficMult = modMult(s, 'traffic')
   const active = (Object.keys(s.channels) as ChannelId[]).filter((c) => s.channels[c] > BAL.activeChannelThreshold)
   const chPenalty = active.length >= 2 ? BAL.multiChannelPenalty : 1
+  const fit = fitFor(s.nicheId)
   let organic = 0
-  for (const c of active) organic += BAL.channels[c].visits(s.channels[c], s.audience) * chPenalty
+  for (const c of active) organic += BAL.channels[c].visits(s.channels[c], s.audience) * chPenalty * fit[c]
   const cpv = BAL.adsCpv(n.competition, s.landing)
   const adsVisits = s.adsSpendToday / cpv
   const spike = s.launchToday ? BAL.launchSpike(s.audience, s.landing, s.validated, s.launches) : 0
